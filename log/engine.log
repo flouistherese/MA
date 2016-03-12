@@ -1,0 +1,294 @@
+2016-03-12 18:39:41,829 INFO 
+
+
+
+
+Starting engine
+2016-03-12 18:39:41,832 INFO Processing STOCK VRX quandl_id=YAHOO/VRX
+2016-03-12 18:39:41,832 INFO Getting Quandl data quandl_id=YAHOO/VRX
+2016-03-12 18:39:47,260 INFO Calculating percentage changes quandl_id=YAHOO/VRX
+2016-03-12 18:39:47,302 INFO Calculating volatility quandl_id=YAHOO/VRX
+2016-03-12 18:39:47,302 INFO Calculating 20-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:39:47,302 INFO Calculating 50-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:39:47,303 INFO Calculating historical signals quandl_id=YAHOO/VRX
+2016-03-12 18:39:47,305 INFO Calculating historical positions quandl_id=YAHOO/VRX
+2016-03-12 18:39:47,341 INFO Processing STOCK AAPL quandl_id=YAHOO/AAPL
+2016-03-12 18:39:47,342 INFO Getting Quandl data quandl_id=YAHOO/AAPL
+2016-03-12 18:39:51,986 INFO Calculating percentage changes quandl_id=YAHOO/AAPL
+2016-03-12 18:39:52,019 INFO Calculating volatility quandl_id=YAHOO/AAPL
+2016-03-12 18:39:52,019 INFO Calculating 20-day moving average quandl_id=YAHOO/AAPL
+2016-03-12 18:39:52,019 INFO Calculating 50-day moving average quandl_id=YAHOO/AAPL
+2016-03-12 18:39:52,020 INFO Calculating historical signals quandl_id=YAHOO/AAPL
+2016-03-12 18:39:52,022 INFO Calculating historical positions quandl_id=YAHOO/AAPL
+2016-03-12 18:39:52,056 INFO Processing STOCK GS quandl_id=YAHOO/GS
+2016-03-12 18:39:52,056 INFO Getting Quandl data quandl_id=YAHOO/GS
+2016-03-12 18:39:55,101 INFO Calculating percentage changes quandl_id=YAHOO/GS
+2016-03-12 18:39:55,130 INFO Calculating volatility quandl_id=YAHOO/GS
+2016-03-12 18:39:55,131 INFO Calculating 20-day moving average quandl_id=YAHOO/GS
+2016-03-12 18:39:55,131 INFO Calculating 50-day moving average quandl_id=YAHOO/GS
+2016-03-12 18:39:55,131 INFO Calculating historical signals quandl_id=YAHOO/GS
+2016-03-12 18:39:55,132 INFO Calculating historical positions quandl_id=YAHOO/GS
+2016-03-12 18:39:55,167 INFO Processing STOCK MSFT quandl_id=YAHOO/MSFT
+2016-03-12 18:39:55,167 INFO Getting Quandl data quandl_id=YAHOO/MSFT
+2016-03-12 18:39:59,328 INFO Calculating percentage changes quandl_id=YAHOO/MSFT
+2016-03-12 18:39:59,364 INFO Calculating volatility quandl_id=YAHOO/MSFT
+2016-03-12 18:39:59,365 INFO Calculating 20-day moving average quandl_id=YAHOO/MSFT
+2016-03-12 18:39:59,365 INFO Calculating 50-day moving average quandl_id=YAHOO/MSFT
+2016-03-12 18:39:59,367 INFO Calculating historical signals quandl_id=YAHOO/MSFT
+2016-03-12 18:39:59,368 INFO Calculating historical positions quandl_id=YAHOO/MSFT
+2016-03-12 18:39:59,401 INFO Processing STOCK C quandl_id=YAHOO/C
+2016-03-12 18:39:59,403 INFO Getting Quandl data quandl_id=YAHOO/C
+2016-03-12 18:40:04,117 INFO Calculating percentage changes quandl_id=YAHOO/C
+2016-03-12 18:40:04,148 INFO Calculating volatility quandl_id=YAHOO/C
+2016-03-12 18:40:04,150 INFO Calculating 20-day moving average quandl_id=YAHOO/C
+2016-03-12 18:40:04,150 INFO Calculating 50-day moving average quandl_id=YAHOO/C
+2016-03-12 18:40:04,151 INFO Calculating historical signals quandl_id=YAHOO/C
+2016-03-12 18:40:04,151 INFO Calculating historical positions quandl_id=YAHOO/C
+2016-03-12 18:40:04,186 INFO Processing STOCK FB quandl_id=YAHOO/FB
+2016-03-12 18:40:04,187 INFO Getting Quandl data quandl_id=YAHOO/FB
+2016-03-12 18:40:05,299 INFO Calculating percentage changes quandl_id=YAHOO/FB
+2016-03-12 18:40:05,326 INFO Calculating volatility quandl_id=YAHOO/FB
+2016-03-12 18:40:05,328 INFO Calculating 20-day moving average quandl_id=YAHOO/FB
+2016-03-12 18:40:05,328 INFO Calculating 50-day moving average quandl_id=YAHOO/FB
+2016-03-12 18:40:05,329 INFO Calculating historical signals quandl_id=YAHOO/FB
+2016-03-12 18:40:05,331 INFO Calculating historical positions quandl_id=YAHOO/FB
+2016-03-12 18:40:05,352 INFO Processing STOCK MMM quandl_id=YAHOO/MMM
+2016-03-12 18:40:05,352 INFO Getting Quandl data quandl_id=YAHOO/MMM
+2016-03-12 18:40:10,979 INFO Calculating percentage changes quandl_id=YAHOO/MMM
+2016-03-12 18:40:11,006 INFO Calculating volatility quandl_id=YAHOO/MMM
+2016-03-12 18:40:11,006 INFO Calculating 20-day moving average quandl_id=YAHOO/MMM
+2016-03-12 18:40:11,007 INFO Calculating 50-day moving average quandl_id=YAHOO/MMM
+2016-03-12 18:40:11,009 INFO Calculating historical signals quandl_id=YAHOO/MMM
+2016-03-12 18:40:11,009 INFO Calculating historical positions quandl_id=YAHOO/MMM
+2016-03-12 18:40:11,045 INFO Processing STOCK AGN quandl_id=YAHOO/AGN
+2016-03-12 18:40:11,046 INFO Getting Quandl data quandl_id=YAHOO/AGN
+2016-03-12 18:40:15,112 INFO Calculating percentage changes quandl_id=YAHOO/AGN
+2016-03-12 18:40:15,144 INFO Calculating volatility quandl_id=YAHOO/AGN
+2016-03-12 18:40:15,145 INFO Calculating 20-day moving average quandl_id=YAHOO/AGN
+2016-03-12 18:40:15,147 INFO Calculating 50-day moving average quandl_id=YAHOO/AGN
+2016-03-12 18:40:15,148 INFO Calculating historical signals quandl_id=YAHOO/AGN
+2016-03-12 18:40:15,148 INFO Calculating historical positions quandl_id=YAHOO/AGN
+2016-03-12 18:40:15,198 INFO Processing STOCK GOOG quandl_id=YAHOO/GOOG
+2016-03-12 18:40:15,200 INFO Getting Quandl data quandl_id=YAHOO/GOOG
+2016-03-12 18:40:17,217 INFO Calculating percentage changes quandl_id=YAHOO/GOOG
+2016-03-12 18:40:17,253 INFO Calculating volatility quandl_id=YAHOO/GOOG
+2016-03-12 18:40:17,253 INFO Calculating 20-day moving average quandl_id=YAHOO/GOOG
+2016-03-12 18:40:17,253 INFO Calculating 50-day moving average quandl_id=YAHOO/GOOG
+2016-03-12 18:40:17,256 INFO Calculating historical signals quandl_id=YAHOO/GOOG
+2016-03-12 18:40:17,256 INFO Calculating historical positions quandl_id=YAHOO/GOOG
+2016-03-12 18:40:17,290 INFO Processing STOCK CAT quandl_id=YAHOO/CAT
+2016-03-12 18:40:17,292 INFO Getting Quandl data quandl_id=YAHOO/CAT
+2016-03-12 18:40:23,253 INFO Calculating percentage changes quandl_id=YAHOO/CAT
+2016-03-12 18:40:23,282 INFO Calculating volatility quandl_id=YAHOO/CAT
+2016-03-12 18:40:23,282 INFO Calculating 20-day moving average quandl_id=YAHOO/CAT
+2016-03-12 18:40:23,282 INFO Calculating 50-day moving average quandl_id=YAHOO/CAT
+2016-03-12 18:40:23,283 INFO Calculating historical signals quandl_id=YAHOO/CAT
+2016-03-12 18:40:23,285 INFO Calculating historical positions quandl_id=YAHOO/CAT
+2016-03-12 18:46:05,055 INFO 
+
+
+
+
+Starting engine
+2016-03-12 18:46:05,058 INFO Processing STOCK VRX quandl_id=YAHOO/VRX
+2016-03-12 18:46:05,058 INFO Getting Quandl data quandl_id=YAHOO/VRX
+2016-03-12 18:46:09,071 INFO Calculating percentage changes quandl_id=YAHOO/VRX
+2016-03-12 18:46:09,101 INFO Calculating volatility quandl_id=YAHOO/VRX
+2016-03-12 18:46:09,102 INFO Calculating 20-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:46:09,102 INFO Calculating 50-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:46:09,104 INFO Calculating historical signals quandl_id=YAHOO/VRX
+2016-03-12 18:46:09,105 INFO Calculating historical positions quandl_id=YAHOO/VRX
+2016-03-12 18:49:01,533 INFO 
+
+
+
+
+Starting engine
+2016-03-12 18:49:01,533 INFO Processing STOCK VRX quandl_id=YAHOO/VRX
+2016-03-12 18:49:01,533 INFO Getting Quandl data quandl_id=YAHOO/VRX
+2016-03-12 18:49:06,213 INFO Calculating percentage changes quandl_id=YAHOO/VRX
+2016-03-12 18:49:06,243 INFO Calculating volatility quandl_id=YAHOO/VRX
+2016-03-12 18:49:06,243 INFO Calculating 20-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:49:06,243 INFO Calculating 50-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:49:06,243 INFO Calculating historical signals quandl_id=YAHOO/VRX
+2016-03-12 18:49:06,243 INFO Calculating historical positions quandl_id=YAHOO/VRX
+2016-03-12 18:51:41,469 INFO 
+
+
+
+
+Starting engine
+2016-03-12 18:51:41,470 INFO Processing STOCK VRX quandl_id=YAHOO/VRX
+2016-03-12 18:51:41,470 INFO Getting Quandl data quandl_id=YAHOO/VRX
+2016-03-12 18:51:45,894 INFO Calculating percentage changes quandl_id=YAHOO/VRX
+2016-03-12 18:51:45,934 INFO Calculating volatility quandl_id=YAHOO/VRX
+2016-03-12 18:51:45,934 INFO Calculating 20-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:51:45,934 INFO Calculating 50-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:51:45,934 INFO Calculating historical signals quandl_id=YAHOO/VRX
+2016-03-12 18:51:45,934 INFO Calculating historical positions quandl_id=YAHOO/VRX
+2016-03-12 18:51:45,974 INFO Processing STOCK AAPL quandl_id=YAHOO/AAPL
+2016-03-12 18:51:45,974 INFO Getting Quandl data quandl_id=YAHOO/AAPL
+2016-03-12 18:51:50,869 INFO Calculating percentage changes quandl_id=YAHOO/AAPL
+2016-03-12 18:51:50,900 INFO Calculating volatility quandl_id=YAHOO/AAPL
+2016-03-12 18:51:50,900 INFO Calculating 20-day moving average quandl_id=YAHOO/AAPL
+2016-03-12 18:51:50,900 INFO Calculating 50-day moving average quandl_id=YAHOO/AAPL
+2016-03-12 18:51:50,900 INFO Calculating historical signals quandl_id=YAHOO/AAPL
+2016-03-12 18:51:50,910 INFO Calculating historical positions quandl_id=YAHOO/AAPL
+2016-03-12 18:51:50,940 INFO Processing STOCK GS quandl_id=YAHOO/GS
+2016-03-12 18:51:50,940 INFO Getting Quandl data quandl_id=YAHOO/GS
+2016-03-12 18:51:53,279 INFO Calculating percentage changes quandl_id=YAHOO/GS
+2016-03-12 18:51:53,309 INFO Calculating volatility quandl_id=YAHOO/GS
+2016-03-12 18:51:53,319 INFO Calculating 20-day moving average quandl_id=YAHOO/GS
+2016-03-12 18:51:53,319 INFO Calculating 50-day moving average quandl_id=YAHOO/GS
+2016-03-12 18:51:53,319 INFO Calculating historical signals quandl_id=YAHOO/GS
+2016-03-12 18:51:53,319 INFO Calculating historical positions quandl_id=YAHOO/GS
+2016-03-12 18:51:53,359 INFO Processing STOCK MSFT quandl_id=YAHOO/MSFT
+2016-03-12 18:51:53,359 INFO Getting Quandl data quandl_id=YAHOO/MSFT
+2016-03-12 18:51:57,290 INFO Calculating percentage changes quandl_id=YAHOO/MSFT
+2016-03-12 18:51:57,321 INFO Calculating volatility quandl_id=YAHOO/MSFT
+2016-03-12 18:51:57,321 INFO Calculating 20-day moving average quandl_id=YAHOO/MSFT
+2016-03-12 18:51:57,321 INFO Calculating 50-day moving average quandl_id=YAHOO/MSFT
+2016-03-12 18:51:57,321 INFO Calculating historical signals quandl_id=YAHOO/MSFT
+2016-03-12 18:51:57,321 INFO Calculating historical positions quandl_id=YAHOO/MSFT
+2016-03-12 18:51:57,361 INFO Processing STOCK C quandl_id=YAHOO/C
+2016-03-12 18:51:57,361 INFO Getting Quandl data quandl_id=YAHOO/C
+2016-03-12 18:52:01,584 INFO Calculating percentage changes quandl_id=YAHOO/C
+2016-03-12 18:52:01,614 INFO Calculating volatility quandl_id=YAHOO/C
+2016-03-12 18:52:01,614 INFO Calculating 20-day moving average quandl_id=YAHOO/C
+2016-03-12 18:52:01,614 INFO Calculating 50-day moving average quandl_id=YAHOO/C
+2016-03-12 18:52:01,614 INFO Calculating historical signals quandl_id=YAHOO/C
+2016-03-12 18:52:01,624 INFO Calculating historical positions quandl_id=YAHOO/C
+2016-03-12 18:52:01,654 INFO Processing STOCK FB quandl_id=YAHOO/FB
+2016-03-12 18:52:01,654 INFO Getting Quandl data quandl_id=YAHOO/FB
+2016-03-12 18:52:02,759 INFO Calculating percentage changes quandl_id=YAHOO/FB
+2016-03-12 18:52:02,799 INFO Calculating volatility quandl_id=YAHOO/FB
+2016-03-12 18:52:02,799 INFO Calculating 20-day moving average quandl_id=YAHOO/FB
+2016-03-12 18:52:02,799 INFO Calculating 50-day moving average quandl_id=YAHOO/FB
+2016-03-12 18:52:02,799 INFO Calculating historical signals quandl_id=YAHOO/FB
+2016-03-12 18:52:02,809 INFO Calculating historical positions quandl_id=YAHOO/FB
+2016-03-12 18:52:02,828 INFO Processing STOCK MMM quandl_id=YAHOO/MMM
+2016-03-12 18:52:02,828 INFO Getting Quandl data quandl_id=YAHOO/MMM
+2016-03-12 18:52:07,888 INFO Calculating percentage changes quandl_id=YAHOO/MMM
+2016-03-12 18:52:07,918 INFO Calculating volatility quandl_id=YAHOO/MMM
+2016-03-12 18:52:07,918 INFO Calculating 20-day moving average quandl_id=YAHOO/MMM
+2016-03-12 18:52:07,918 INFO Calculating 50-day moving average quandl_id=YAHOO/MMM
+2016-03-12 18:52:07,918 INFO Calculating historical signals quandl_id=YAHOO/MMM
+2016-03-12 18:52:07,918 INFO Calculating historical positions quandl_id=YAHOO/MMM
+2016-03-12 18:52:07,948 INFO Processing STOCK AGN quandl_id=YAHOO/AGN
+2016-03-12 18:52:07,948 INFO Getting Quandl data quandl_id=YAHOO/AGN
+2016-03-12 18:52:11,457 INFO Calculating percentage changes quandl_id=YAHOO/AGN
+2016-03-12 18:52:11,492 INFO Calculating volatility quandl_id=YAHOO/AGN
+2016-03-12 18:52:11,493 INFO Calculating 20-day moving average quandl_id=YAHOO/AGN
+2016-03-12 18:52:11,493 INFO Calculating 50-day moving average quandl_id=YAHOO/AGN
+2016-03-12 18:52:11,493 INFO Calculating historical signals quandl_id=YAHOO/AGN
+2016-03-12 18:52:11,494 INFO Calculating historical positions quandl_id=YAHOO/AGN
+2016-03-12 18:52:11,532 INFO Processing STOCK GOOG quandl_id=YAHOO/GOOG
+2016-03-12 18:52:11,532 INFO Getting Quandl data quandl_id=YAHOO/GOOG
+2016-03-12 18:52:13,578 INFO Calculating percentage changes quandl_id=YAHOO/GOOG
+2016-03-12 18:52:13,628 INFO Calculating volatility quandl_id=YAHOO/GOOG
+2016-03-12 18:52:13,628 INFO Calculating 20-day moving average quandl_id=YAHOO/GOOG
+2016-03-12 18:52:13,638 INFO Calculating 50-day moving average quandl_id=YAHOO/GOOG
+2016-03-12 18:52:13,638 INFO Calculating historical signals quandl_id=YAHOO/GOOG
+2016-03-12 18:52:13,638 INFO Calculating historical positions quandl_id=YAHOO/GOOG
+2016-03-12 18:52:13,697 INFO Processing STOCK CAT quandl_id=YAHOO/CAT
+2016-03-12 18:52:13,697 INFO Getting Quandl data quandl_id=YAHOO/CAT
+2016-03-12 18:52:19,595 INFO Calculating percentage changes quandl_id=YAHOO/CAT
+2016-03-12 18:52:19,625 INFO Calculating volatility quandl_id=YAHOO/CAT
+2016-03-12 18:52:19,625 INFO Calculating 20-day moving average quandl_id=YAHOO/CAT
+2016-03-12 18:52:19,625 INFO Calculating 50-day moving average quandl_id=YAHOO/CAT
+2016-03-12 18:52:19,625 INFO Calculating historical signals quandl_id=YAHOO/CAT
+2016-03-12 18:52:19,625 INFO Calculating historical positions quandl_id=YAHOO/CAT
+2016-03-12 18:58:29,759 INFO 
+
+
+
+
+Starting engine
+2016-03-12 18:58:29,760 INFO Processing STOCK VRX quandl_id=YAHOO/VRX
+2016-03-12 18:58:29,760 INFO Getting Quandl data quandl_id=YAHOO/VRX
+2016-03-12 18:58:33,576 INFO Calculating percentage changes quandl_id=YAHOO/VRX
+2016-03-12 18:58:33,614 INFO Calculating volatility quandl_id=YAHOO/VRX
+2016-03-12 18:58:33,615 INFO Calculating 20-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:58:33,615 INFO Calculating 50-day moving average quandl_id=YAHOO/VRX
+2016-03-12 18:58:33,618 INFO Calculating historical signals quandl_id=YAHOO/VRX
+2016-03-12 18:58:33,670 INFO Calculating historical positions quandl_id=YAHOO/VRX
+2016-03-12 18:58:33,704 INFO Processing STOCK AAPL quandl_id=YAHOO/AAPL
+2016-03-12 18:58:33,706 INFO Getting Quandl data quandl_id=YAHOO/AAPL
+2016-03-12 18:58:38,079 INFO Calculating percentage changes quandl_id=YAHOO/AAPL
+2016-03-12 18:58:38,111 INFO Calculating volatility quandl_id=YAHOO/AAPL
+2016-03-12 18:58:38,112 INFO Calculating 20-day moving average quandl_id=YAHOO/AAPL
+2016-03-12 18:58:38,112 INFO Calculating 50-day moving average quandl_id=YAHOO/AAPL
+2016-03-12 18:58:38,115 INFO Calculating historical signals quandl_id=YAHOO/AAPL
+2016-03-12 18:58:38,121 INFO Calculating historical positions quandl_id=YAHOO/AAPL
+2016-03-12 18:58:38,173 INFO Processing STOCK GS quandl_id=YAHOO/GS
+2016-03-12 18:58:38,173 INFO Getting Quandl data quandl_id=YAHOO/GS
+2016-03-12 18:58:40,555 INFO Calculating percentage changes quandl_id=YAHOO/GS
+2016-03-12 18:58:40,598 INFO Calculating volatility quandl_id=YAHOO/GS
+2016-03-12 18:58:40,599 INFO Calculating 20-day moving average quandl_id=YAHOO/GS
+2016-03-12 18:58:40,601 INFO Calculating 50-day moving average quandl_id=YAHOO/GS
+2016-03-12 18:58:40,601 INFO Calculating historical signals quandl_id=YAHOO/GS
+2016-03-12 18:58:40,609 INFO Calculating historical positions quandl_id=YAHOO/GS
+2016-03-12 18:58:40,644 INFO Processing STOCK MSFT quandl_id=YAHOO/MSFT
+2016-03-12 18:58:40,644 INFO Getting Quandl data quandl_id=YAHOO/MSFT
+2016-03-12 18:58:44,700 INFO Calculating percentage changes quandl_id=YAHOO/MSFT
+2016-03-12 18:58:44,733 INFO Calculating volatility quandl_id=YAHOO/MSFT
+2016-03-12 18:58:44,734 INFO Calculating 20-day moving average quandl_id=YAHOO/MSFT
+2016-03-12 18:58:44,736 INFO Calculating 50-day moving average quandl_id=YAHOO/MSFT
+2016-03-12 18:58:44,737 INFO Calculating historical signals quandl_id=YAHOO/MSFT
+2016-03-12 18:58:44,743 INFO Calculating historical positions quandl_id=YAHOO/MSFT
+2016-03-12 18:58:44,776 INFO Processing STOCK C quandl_id=YAHOO/C
+2016-03-12 18:58:44,778 INFO Getting Quandl data quandl_id=YAHOO/C
+2016-03-12 18:58:49,286 INFO Calculating percentage changes quandl_id=YAHOO/C
+2016-03-12 18:58:49,322 INFO Calculating volatility quandl_id=YAHOO/C
+2016-03-12 18:58:49,323 INFO Calculating 20-day moving average quandl_id=YAHOO/C
+2016-03-12 18:58:49,325 INFO Calculating 50-day moving average quandl_id=YAHOO/C
+2016-03-12 18:58:49,325 INFO Calculating historical signals quandl_id=YAHOO/C
+2016-03-12 18:58:49,331 INFO Calculating historical positions quandl_id=YAHOO/C
+2016-03-12 18:58:49,365 INFO Processing STOCK FB quandl_id=YAHOO/FB
+2016-03-12 18:58:49,365 INFO Getting Quandl data quandl_id=YAHOO/FB
+2016-03-12 18:58:50,414 INFO Calculating percentage changes quandl_id=YAHOO/FB
+2016-03-12 18:58:50,444 INFO Calculating volatility quandl_id=YAHOO/FB
+2016-03-12 18:58:50,444 INFO Calculating 20-day moving average quandl_id=YAHOO/FB
+2016-03-12 18:58:50,444 INFO Calculating 50-day moving average quandl_id=YAHOO/FB
+2016-03-12 18:58:50,446 INFO Calculating historical signals quandl_id=YAHOO/FB
+2016-03-12 18:58:50,450 INFO Calculating historical positions quandl_id=YAHOO/FB
+2016-03-12 18:58:50,474 INFO Processing STOCK MMM quandl_id=YAHOO/MMM
+2016-03-12 18:58:50,476 INFO Getting Quandl data quandl_id=YAHOO/MMM
+2016-03-12 19:00:23,503 INFO 
+
+
+
+
+Starting engine
+2016-03-12 19:00:23,503 INFO Processing STOCK VRX quandl_id=YAHOO/VRX
+2016-03-12 19:00:23,503 INFO Getting Quandl data quandl_id=YAHOO/VRX
+2016-03-12 19:00:28,003 INFO Calculating percentage changes quandl_id=YAHOO/VRX
+2016-03-12 19:00:28,033 INFO Calculating volatility quandl_id=YAHOO/VRX
+2016-03-12 19:00:28,033 INFO Calculating 20-day moving average quandl_id=YAHOO/VRX
+2016-03-12 19:00:28,033 INFO Calculating 50-day moving average quandl_id=YAHOO/VRX
+2016-03-12 19:00:28,033 INFO Calculating historical signals quandl_id=YAHOO/VRX
+2016-03-12 19:00:28,084 INFO Calculating historical positions quandl_id=YAHOO/VRX
+2016-03-12 19:01:23,645 INFO Processing STOCK VRX quandl_id=YAHOO/VRX
+2016-03-12 19:01:23,645 INFO Getting Quandl data quandl_id=YAHOO/VRX
+2016-03-12 19:01:27,108 INFO Calculating percentage changes quandl_id=YAHOO/VRX
+2016-03-12 19:01:27,148 INFO Calculating volatility quandl_id=YAHOO/VRX
+2016-03-12 19:01:27,148 INFO Calculating 20-day moving average quandl_id=YAHOO/VRX
+2016-03-12 19:01:27,148 INFO Calculating 50-day moving average quandl_id=YAHOO/VRX
+2016-03-12 19:01:27,148 INFO Calculating historical signals quandl_id=YAHOO/VRX
+2016-03-12 19:01:27,187 INFO Calculating historical positions quandl_id=YAHOO/VRX
+2016-03-12 19:01:27,217 INFO Processing STOCK AAPL quandl_id=YAHOO/AAPL
+2016-03-12 19:01:27,217 INFO Getting Quandl data quandl_id=YAHOO/AAPL
+2016-03-12 19:01:31,895 INFO Calculating percentage changes quandl_id=YAHOO/AAPL
+2016-03-12 19:01:31,926 INFO Calculating volatility quandl_id=YAHOO/AAPL
+2016-03-12 19:01:31,926 INFO Calculating 20-day moving average quandl_id=YAHOO/AAPL
+2016-03-12 19:01:31,926 INFO Calculating 50-day moving average quandl_id=YAHOO/AAPL
+2016-03-12 19:01:31,926 INFO Calculating historical signals quandl_id=YAHOO/AAPL
+2016-03-12 19:01:31,936 INFO Calculating historical positions quandl_id=YAHOO/AAPL
+2016-03-12 19:01:31,966 INFO Processing STOCK GS quandl_id=YAHOO/GS
+2016-03-12 19:01:31,966 INFO Getting Quandl data quandl_id=YAHOO/GS
+2016-03-12 19:01:34,546 INFO Calculating percentage changes quandl_id=YAHOO/GS
+2016-03-12 19:01:34,585 INFO Calculating volatility quandl_id=YAHOO/GS
+2016-03-12 19:01:34,585 INFO Calculating 20-day moving average quandl_id=YAHOO/GS
+2016-03-12 19:01:34,585 INFO Calculating 50-day moving average quandl_id=YAHOO/GS
+2016-03-12 19:01:34,585 INFO Calculating historical signals quandl_id=YAHOO/GS
+2016-03-12 19:01:34,585 INFO Calculating historical positions quandl_id=YAHOO/GS
