@@ -1,20 +1,24 @@
+import os
+os.chdir('H:/Dropbox/Dropbox/Code/Python/strategies/MA/')
 
-
-execfile('H:/Dropbox/Dropbox/Code/Python/strategies/MA/imports.py')
-execfile('H:/Dropbox/Dropbox/Code/Python/strategies/MA/common.py')
-execfile('H:/Dropbox/Dropbox/Code/Python/strategies/MA/trend.py')
+execfile('imports.py')
+execfile('common.py')
+execfile('trend.py')
+execfile('pnl_snapshot.py')
 %matplotlib qt
 
 config = ConfigParser.ConfigParser()
-config.read("H:/Dropbox/Dropbox/Code/Python/strategies/MA/config/engine.config")
+config.read("config/engine.config")
 logger = createLogger(config.get('ConfigSettings','logfile_path'))
 
 logger.info('\n\n\n\n\nStarting engine')
 capital = float(config.get('AccountSettings','capital'))
 markets = pd.read_csv(config.get('StrategySettings','markets_path'), sep=',')
+store_positions = config.getboolean('StrategySettings','store_positions')
 positions_path = config.get('StrategySettings','positions_path')
+signals_path = config.get('StrategySettings','signals_path')
 
 for index, row in markets.iterrows():
     logger.info('Processing '+row['instrument_type']+' '+ row['instrument']+' quandl_id='+row['quandl_id'])
-    calculate_positions(row['quandl_id'], row['instrument'], logger)
+    calculate_positions(row['quandl_id'], row['instrument'], logger, config)
 

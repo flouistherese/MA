@@ -1,4 +1,9 @@
-def calculate_positions(quandl_id, instrument, logger):
+def calculate_positions(quandl_id, instrument, logger, config):
+
+    quandl_id = 'YAHOO/FB'
+    instrument = 'FB'
+
+    transaction_cost = float(config.get('AccountSettings', 'transaction_cost'))
     logger.info('Getting Quandl data quandl_id='+quandl_id)
     data = getHistoricalData(quandl_id, logger)    
     
@@ -21,22 +26,29 @@ def calculate_positions(quandl_id, instrument, logger):
     
     logger.info('Calculating historical signals quandl_id='+quandl_id)
     close['signal'] = np.sign(close['ma20'] - close['ma100'])
+    close['signal'][np.isnan(close['signal'])] = 0
     
-    close
-    
-    plt.ion()
-    plt.plot(close['Close'], ls = '-')
-    plt.plot(close['ma20'], ls = '-')
-    #plt.plot(close['ma50'], ls = '-')
-    plt.plot(close['ma100'], ls = '-')
-    #plt.plot(close['ma200'], ls = '-')
-    plt.plot(close['signal'], ls='-')
-    plt.show()
-    
+    #plot_signals(close)
+
     logger.info('Calculating historical positions quandl_id='+ quandl_id)
-    close['position'] = close.apply(lambda row: trade_size(row['signal'], capital, row['10d_vol']), axis=1)
+    close['position'] = close.apply(lambda row: trade_size(row['signal'], capital, row['10d_vol'], row['Close']), axis=1)
+    close['position'][np.isnan(close['position'])] = 0
     
-    positions_directory_path = positions_path + strftime("%Y-%m-%d")
-    if not os.path.exists(positions_directory_path):
-        os.makedirs(positions_directory_path)
-    close.to_csv(positions_directory_path + '/' + instrument + '_' + strftime("%Y-%m-%d_%H-%M-%S") + '.csv',mode  = 'w+')
+    if store_positions:
+        store_positions(close, positions_path, instrument, quandl_id, logger)
+        
+    close['trade'] = close[['position']].diff()
+
+    close['notional'] = close.apply(lambda row: abs(row['position'] * row['Close']) , axis=1)
+
+    close['transaction_cost'] = close.apply(lambda row: abs(row['trade'] * transaction_cost) , axis=1)
+    
+    
+    transaction_costs = close['transaction_cost'].values
+    
+    pnl = calculate_pnl(close,instrument)
+    
+    close['pnl'] = pad(pnl, len(close) - pnl.size, float(0))
+    
+    plot_pnl(close)
+        
