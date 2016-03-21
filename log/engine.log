@@ -1579,3 +1579,44 @@ Starting engine
 2016-03-19 16:45:31,153 INFO Calculating 50-day moving average quandl_id=YAHOO/FB
 2016-03-19 16:45:31,154 INFO Calculating historical signals quandl_id=YAHOO/FB
 2016-03-19 16:45:31,157 INFO Calculating historical positions quandl_id=YAHOO/FB
+2016-03-19 17:08:21,697 INFO Getting Quandl data quandl_id=YAHOO/GOOG
+2016-03-19 17:08:24,414 INFO Calculating percentage changes quandl_id=YAHOO/GOOG
+2016-03-19 17:08:24,453 INFO Calculating volatility quandl_id=YAHOO/GOOG
+2016-03-19 17:08:24,454 INFO Calculating 20-day moving average quandl_id=YAHOO/GOOG
+2016-03-19 17:08:24,456 INFO Calculating 50-day moving average quandl_id=YAHOO/GOOG
+2016-03-19 17:08:24,457 INFO Calculating historical signals quandl_id=YAHOO/GOOG
+2016-03-19 17:08:24,460 INFO Calculating historical positions quandl_id=YAHOO/GOOG
+2016-03-19 17:09:25,661 INFO Getting Quandl data quandl_id=YAHOO/AGN
+2016-03-19 17:09:29,006 INFO Calculating percentage changes quandl_id=YAHOO/AGN
+2016-03-19 17:09:29,051 INFO Calculating volatility quandl_id=YAHOO/AGN
+2016-03-19 17:09:29,052 INFO Calculating 20-day moving average quandl_id=YAHOO/AGN
+2016-03-19 17:09:29,052 INFO Calculating 50-day moving average quandl_id=YAHOO/AGN
+2016-03-19 17:09:29,055 INFO Calculating historical signals quandl_id=YAHOO/AGN
+2016-03-19 17:09:29,056 INFO Calculating historical positions quandl_id=YAHOO/AGN
+2016-03-19 17:10:07,378 INFO Getting Quandl data quandl_id=YAHOO/CAT
+2016-03-19 17:10:13,786 INFO Calculating percentage changes quandl_id=YAHOO/CAT
+2016-03-19 17:10:13,828 INFO Calculating volatility quandl_id=YAHOO/CAT
+2016-03-19 17:10:13,829 INFO Calculating 20-day moving average quandl_id=YAHOO/CAT
+2016-03-19 17:10:13,831 INFO Calculating 50-day moving average quandl_id=YAHOO/CAT
+2016-03-19 17:10:13,832 INFO Calculating historical signals quandl_id=YAHOO/CAT
+2016-03-19 17:10:13,835 INFO Calculating historical positions quandl_id=YAHOO/CAT
+2016-03-21 21:22:41,428 INFO 
+
+
+
+
+Starting engine
+2016-03-21 21:22:59,825 INFO Getting Quandl data quandl_id=YAHOO/CAT
+2016-03-21 21:23:07,365 INFO Calculating percentage changes quandl_id=YAHOO/CAT
+2016-03-21 21:23:07,398 INFO Calculating volatility quandl_id=YAHOO/CAT
+2016-03-21 21:23:07,400 INFO Calculating 20-day moving average quandl_id=YAHOO/CAT
+2016-03-21 21:23:07,401 INFO Calculating 50-day moving average quandl_id=YAHOO/CAT
+2016-03-21 21:23:07,404 INFO Calculating historical signals quandl_id=YAHOO/CAT
+2016-03-21 21:23:07,405 INFO Calculating historical positions quandl_id=YAHOO/CAT
+2016-03-21 22:32:54,849 INFO Getting Quandl data quandl_id=YAHOO/CAT
+2016-03-21 22:33:01,200 INFO Calculating percentage changes quandl_id=YAHOO/CAT
+2016-03-21 22:33:01,246 INFO Calculating volatility quandl_id=YAHOO/CAT
+2016-03-21 22:33:01,247 INFO Calculating 20-day moving average quandl_id=YAHOO/CAT
+2016-03-21 22:33:01,249 INFO Calculating 50-day moving average quandl_id=YAHOO/CAT
+2016-03-21 22:33:01,250 INFO Calculating historical signals quandl_id=YAHOO/CAT
+2016-03-21 22:33:01,253 INFO Calculating historical positions quandl_id=YAHOO/CAT

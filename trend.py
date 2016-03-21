@@ -1,7 +1,7 @@
 def calculate_positions(quandl_id, instrument, logger, config):
 
-    quandl_id = 'YAHOO/FB'
-    instrument = 'FB'
+    quandl_id = 'YAHOO/CAT'
+    instrument = 'CAT'
 
     transaction_cost = float(config.get('AccountSettings', 'transaction_cost'))
     logger.info('Getting Quandl data quandl_id='+quandl_id)
@@ -50,5 +50,5 @@ def calculate_positions(quandl_id, instrument, logger, config):
     
     close['pnl'] = pad(pnl, len(close) - pnl.size, float(0))
     
-    plot_pnl(close)
+    plot_pnl(close,instrument)
         

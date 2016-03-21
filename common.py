@@ -81,10 +81,6 @@ def calculate_pnl(close, instrument):
             pnl = np.append(pnl, pnl_snapshot.m_total_pnl - row['transaction_cost'])
         row_number += 1
     return pnl
-
-        
-        
-
     
 #'YAHOO/AAPL'
 #'CHRIS/CME_CL1'
