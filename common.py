@@ -76,12 +76,12 @@ def calculate_pnl(close, instrument):
     row_number = 0
     for index, row in positions.iterrows():
         if row_number > 0:
-            pnl_snapshot.update_by_marketdata(row['Close'])
             pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), row['Close'], abs(row['trade']))
+            pnl_snapshot.update_by_marketdata(row['Close'])
             pnl = np.append(pnl, pnl_snapshot.m_total_pnl - row['transaction_cost'])
         row_number += 1
     return pnl
-    
+
 #'YAHOO/AAPL'
 #'CHRIS/CME_CL1'
 #plt.plot(data['Open'])
