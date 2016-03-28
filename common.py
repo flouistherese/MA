@@ -39,10 +39,7 @@ def plot_signals(close):
     plt.ion()
     plt.plot(close['Close'], ls = '-')
     plt.plot(close['ma20'], ls = '-')
-    #plt.plot(close['ma50'], ls = '-')
     plt.plot(close['ma100'], ls = '-')
-    #plt.plot(close['ma200'], ls = '-')
-    plt.plot(close['signal'], ls='-')
     plt.show()
 
 def plot_pnl(close,instrument):
@@ -52,10 +49,7 @@ def plot_pnl(close,instrument):
     plt.subplot(411)
     plt.plot(close['Close'], ls = '-')
     plt.plot(close['ma20'], ls = '-')
-    #plt.plot(close['ma50'], ls = '-')
     plt.plot(close['ma100'], ls = '-')
-    #plt.plot(close['ma200'], ls = '-')
-    plt.plot(close['signal'], ls='-')
     plt.title(instrument)
     plt.ylabel('Price')
     plt.subplot(412)
@@ -65,23 +59,64 @@ def plot_pnl(close,instrument):
     plt.plot(close['position'])
     plt.ylabel('Position')
     plt.subplot(414)
-    plt.plot(close['10d_vol'])
+    plt.plot(close['vol'])
     plt.ylabel('vol')
     plt.show()
     
-def calculate_pnl(close, instrument):
+def calculate_pnl(close, instrument, slippage):
     pnl = np.array([])
-    positions = close[close['signal'] != 0]
+    positions = close[close['signal'] != 0][ - np.isnan(close['vol'])]
     pnl_snapshot = PnlSnapshot(instrument, np.sign(positions.ix[0].trade), positions.ix[0].Close, abs(positions.ix[0].trade))
     row_number = 0
     for index, row in positions.iterrows():
         if row_number > 0:
-            pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), row['Close'], abs(row['trade']))
+            fill_price = row['Close'] + np.sign(row['trade']) * slippage
+            pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), fill_price , abs(row['trade']))
             pnl_snapshot.update_by_marketdata(row['Close'])
             pnl = np.append(pnl, pnl_snapshot.m_total_pnl - row['transaction_cost'])
         row_number += 1
     return pnl
-
+    
+def annualised_sharpe(returns, risk_free_rate = 0.02, N=252):
+    excess_returns = returns - (risk_free_rate/N)
+    
+    #TODO: Returns = daily pnl as percentage return on capital, daily percentage change in total USD pnl?
+    return np.sqrt(N) * (excess_returns.mean()) / excess_returns.std()
+    
+def daily_drawdown(pnl_usd, window = 252):
+    # Calculate the max drawdown in the past window days for each day in the series.
+    # Use min_periods=1 if you want to let the first 252 days data have an expanding window
+    Roll_Max = pd.rolling_max(pnl_usd, window, min_periods=1)
+    Daily_Drawdown = pnl_usd - Roll_Max
+    Daily_Drawdown_Pct = (pnl_usd - Roll_Max)/Roll_Max
+    
+    #TODO: Drawdown in USD or in percentage drop since peak?
+    
+    return Daily_Drawdown
+    
+def calculate_model_gearing(pnl, capital = 100E6, vol_target = 0.15, window = 252):
+    annualized_usd_vol = np.sqrt(252)*pnl.std()
+    gearing_factor = (vol_target * capital) / annualized_usd_vol
+    
+    return gearing_factor
+    
+def apply_model_gearing(close, gearing_factor, instrument, capital):
+    close['position'] = close['position'] * gearing_factor
+    close['trade'] = close['trade'] * gearing_factor
+    close['notional'] = close.apply(lambda row: abs(row['position'] * row['Close']) , axis=1)
+    close['transaction_cost'] = close.apply(lambda row: abs(row['trade'] * transaction_cost) , axis=1)
+    
+    close = update_pnl(close, instrument, slippage, capital)
+    return close
+    
+def update_pnl(close, instrument, slippage = 0.005, capital = 100E6):
+    pnl = calculate_pnl(close, instrument, slippage)
+    close['pnl'] = pad(pnl, len(close) - pnl.size, float(0))
+    close['daily_pnl'] = close['pnl'].diff()
+    close['daily_pnl_pct'] = close['pnl'] / capital
+    
+    return close
+    
 #'YAHOO/AAPL'
 #'CHRIS/CME_CL1'
 #plt.plot(data['Open'])
