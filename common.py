@@ -32,12 +32,12 @@ def store_positions(close, positions_path, instrument, quandl_id, logger):
         os.makedirs(positions_directory_path)
     positions_file_path = positions_directory_path + '/' + instrument + '_' + strftime("%Y-%m-%d_%H-%M-%S") + '.csv'
     logger.info('Storing positions to '+positions_file_path+' quandl_id='+ quandl_id)
-    close[['Close','position']].to_csv(positions_file_path,mode  = 'w+')
+    close[['close','position']].to_csv(positions_file_path,mode  = 'w+')
 
 def plot_signals(close):
     plt.figure()
     plt.ion()
-    plt.plot(close['Close'], ls = '-')
+    plt.plot(close['close'], ls = '-')
     plt.plot(close['ma20'], ls = '-')
     plt.plot(close['ma100'], ls = '-')
     plt.show()
@@ -47,8 +47,8 @@ def plot_pnl(close,instrument):
     plt.ion()
     
     plt.subplot(411)
-    plt.plot(close['Close'], ls = '-')
-    plt.plot(close['ma20'], ls = '-')
+    plt.plot(close['close'], ls = '-')
+    plt.plot(close['ma50'], ls = '-')
     plt.plot(close['ma100'], ls = '-')
     plt.title(instrument)
     plt.ylabel('Price')
@@ -56,8 +56,8 @@ def plot_pnl(close,instrument):
     plt.plot(close['pnl'])
     plt.ylabel('PnL')
     plt.subplot(413)
-    plt.plot(close['position'])
-    plt.ylabel('Position')
+    plt.plot(close['notional'])
+    plt.ylabel('Notional')
     plt.subplot(414)
     plt.plot(close['vol'])
     plt.ylabel('vol')
@@ -66,13 +66,13 @@ def plot_pnl(close,instrument):
 def calculate_pnl(close, instrument, slippage):
     pnl = np.array([])
     positions = close[close['signal'] != 0][ - np.isnan(close['vol'])]
-    pnl_snapshot = PnlSnapshot(instrument, np.sign(positions.ix[0].trade), positions.ix[0].Close, abs(positions.ix[0].trade))
+    pnl_snapshot = PnlSnapshot(instrument, np.sign(positions.ix[0].trade), positions.ix[0].close, abs(positions.ix[0].trade))
     row_number = 0
     for index, row in positions.iterrows():
         if row_number > 0:
-            fill_price = row['Close'] + np.sign(row['trade']) * slippage
+            fill_price = row['close'] + np.sign(row['trade']) * slippage
             pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), fill_price , abs(row['trade']))
-            pnl_snapshot.update_by_marketdata(row['Close'])
+            pnl_snapshot.update_by_marketdata(row['close'])
             pnl = np.append(pnl, pnl_snapshot.m_total_pnl - row['transaction_cost'])
         row_number += 1
     return pnl
@@ -94,6 +94,13 @@ def daily_drawdown(pnl_usd, window = 252):
     
     return Daily_Drawdown
     
+def plot_drawdown(drawdown):
+    plt.figure()
+    plt.plot(drawdown)
+    plt.ylabel('Drawdown')
+    plt.title('Drawdown')
+    plt.show()
+    
 def calculate_model_gearing(pnl, capital = 100E6, vol_target = 0.15, window = 252):
     annualized_usd_vol = np.sqrt(252)*pnl.std()
     gearing_factor = (vol_target * capital) / annualized_usd_vol
@@ -103,7 +110,7 @@ def calculate_model_gearing(pnl, capital = 100E6, vol_target = 0.15, window = 25
 def apply_model_gearing(close, gearing_factor, instrument, capital):
     close['position'] = close['position'] * gearing_factor
     close['trade'] = close['trade'] * gearing_factor
-    close['notional'] = close.apply(lambda row: abs(row['position'] * row['Close']) , axis=1)
+    close['notional'] = calculate_notional_positions(close)
     close['transaction_cost'] = close.apply(lambda row: abs(row['trade'] * transaction_cost) , axis=1)
     
     close = update_pnl(close, instrument, slippage, capital)
@@ -113,10 +120,24 @@ def update_pnl(close, instrument, slippage = 0.005, capital = 100E6):
     pnl = calculate_pnl(close, instrument, slippage)
     close['pnl'] = pad(pnl, len(close) - pnl.size, float(0))
     close['daily_pnl'] = close['pnl'].diff()
-    close['daily_pnl_pct'] = close['pnl'] / capital
+    close['daily_pnl_pct'] = close['daily_pnl'] / capital
     
     return close
+
+def calculate_volatility(data, window):
+    pct_change = data.pct_change()
+    return pd.rolling_std(pct_change, window)
     
+def calculate_historical_positions(data):
+    positions = data.apply(lambda row: trade_size(row['signal'], capital, row['vol'], row['close']), axis=1)
+    positions[np.isnan(positions)] = 0
+    return positions
+
+def calculate_notional_positions(data):
+    return data.apply(lambda row: row['position'] * row['close'] , axis=1)
+    
+def calculate_transaction_costs(data, transaction_cost):
+    return data.apply(lambda row: abs(row['trade'] * transaction_cost) , axis=1)
 #'YAHOO/AAPL'
 #'CHRIS/CME_CL1'
 #plt.plot(data['Open'])
