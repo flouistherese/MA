@@ -42,7 +42,7 @@ def plot_signals(close):
     plt.plot(close['ma100'], ls = '-')
     plt.show()
 
-def plot_pnl(close,instrument):
+def plot_pnl(close, model):
     plt.figure()
     plt.ion()
     
@@ -50,7 +50,7 @@ def plot_pnl(close,instrument):
     plt.plot(close['close'], ls = '-')
     plt.plot(close['ma50'], ls = '-')
     plt.plot(close['ma100'], ls = '-')
-    plt.title(instrument)
+    plt.title(model)
     plt.ylabel('Price')
     plt.subplot(412)
     plt.plot(close['pnl'])
@@ -138,6 +138,21 @@ def calculate_notional_positions(data):
     
 def calculate_transaction_costs(data, transaction_cost):
     return data.apply(lambda row: abs(row['trade'] * transaction_cost) , axis=1)
+    
+def plot_pnl_by_model(pnl):
+    fig, ax = plt.subplots(figsize=(8,6))
+    for label, df in pnl.groupby('model'):
+        df.pnl.plot( ax=ax, label=label)
+    plt.title('PnL by model')
+    plt.ylabel('PnL in USD')
+    plt.legend()
+    
+def plot_total_pnl(pnl):
+    total_pnl = pnl.groupby(pnl.index).sum()
+    plt.figure()
+    plt.title('Total PnL')
+    plt.ylabel('PnL in USD')
+    plt.plot(total_pnl)
 #'YAHOO/AAPL'
 #'CHRIS/CME_CL1'
 #plt.plot(data['Open'])

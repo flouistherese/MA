@@ -13,14 +13,24 @@ logger = createLogger(config.get('ConfigSettings','logfile_path'))
 
 logger.info('\n\n\n\n\nStarting engine')
 capital = float(config.get('AccountSettings','capital'))
-markets = pd.read_csv(config.get('StrategySettings','markets_path'), sep=',')
+models = pd.read_csv(config.get('StrategySettings','models_path'), sep=',')
 vol_target = float(config.get('AccountSettings','volatility_target'))
 slippage = float(config.get('StrategySettings','slippage'))
 store_positions = config.getboolean('StrategySettings','store_positions')
 positions_path = config.get('StrategySettings','positions_path')
 signals_path = config.get('StrategySettings','signals_path')
 
-for index, row in markets.iterrows():
-    logger.info('Processing '+row['instrument_type']+' '+ row['instrument']+' quandl_id='+row['quandl_id'])
-    calculate_positions(row['quandl_id'], row['instrument'], logger, config)
+positions = pd.DataFrame()
+notionals = pd.DataFrame()
+pnl = pd.DataFrame()
 
+for index, row in models.iterrows():
+    logger.info('Processing '+ row['model'] +' '+row['instrument_type']+' '+ row['instrument']+' quandl_id='+row['quandl_id'])
+    result = calculate_positions(row['model'], row['quandl_id'], row['instrument'], logger, config)
+    positions = pd.concat([positions, result.positions])
+    notionals = pd.concat([notionals, result.notionals])
+    pnl = pd.concat([pnl, result.pnl])
+    
+plot_pnl_by_model(pnl)
+    
+plot_total_pnl(pnl)

@@ -1,9 +1,10 @@
-def calculate_positions(quandl_id, instrument, logger, config):
+def calculate_positions(model, quandl_id, instrument, logger, config):
 
 ####TEST CONFIG
-    quandl_id = 'YAHOO/F'
-    instrument = 'F'
-    config.read("config/engine.config")
+    #model = 'EQUITY_TREND_FB'
+    #quandl_id = 'YAHOO/QCOM'
+    #instrument = 'QCOM'
+    #config.read("config/engine.config")
 ####
     
     
@@ -55,7 +56,13 @@ def calculate_positions(quandl_id, instrument, logger, config):
     drawdown = daily_drawdown(close['pnl'])
     #plot_drawdown(drawdown)
     
-    plot_pnl(close,instrument)
+    
+    #plot_pnl(close,model)
+    
+    close['model'] = model
+    model_run_result = collections.namedtuple('ModelRunResult', ['positions', 'notionals', 'pnl'])
+    
+    return model_run_result(positions = close[['model', 'position']], notionals = close[['model', 'notional']], pnl = close[['model', 'pnl']])
     
     
 def generate_signal(data):
