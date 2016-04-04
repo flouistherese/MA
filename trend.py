@@ -1,25 +1,23 @@
 def calculate_positions(model, quandl_id, instrument, logger, config):
 
 ####TEST CONFIG
-    #model = 'EQUITY_TREND_FB'
-    #quandl_id = 'YAHOO/QCOM'
-    #instrument = 'QCOM'
-    #config.read("config/engine.config")
+#    model = 'EQUITY_TREND_FB'
+#    quandl_id = 'YAHOO/QCOM'
+#    instrument = 'QCOM'
+#    config.read("config/engine.config")
 ####
     
-    
-    transaction_cost = float(config.get('AccountSettings', 'transaction_cost'))
     logger.info('Getting Quandl data quandl_id='+quandl_id)
     data = getHistoricalData(quandl_id, logger)    
     
-    close = data[['Close']]['1/1/2005':]
+    close = data[['Adjusted Close']]['1/1/2005':]
     close.columns = ['close']
     
     volatility_window = float(config.get('StrategySettings', 'volatility_window'))
     logger.info('Calculating '+ str(volatility_window) +'-day volatility quandl_id='+quandl_id)
     close['vol'] = calculate_volatility(close, volatility_window)
     
-    close = generate_signal(close)
+    close = generate_signal(close, quandl_id)
 
     logger.info('Calculating historical positions quandl_id='+ quandl_id)
     close['position'] = calculate_historical_positions(close) 
@@ -58,14 +56,21 @@ def calculate_positions(model, quandl_id, instrument, logger, config):
     
     
     #plot_pnl(close,model)
-    
+    date_range = pd.date_range(close.index.min(),close.index.max())
+    close = close.reindex(date_range)
+    close['close'] = close['close'].fillna(method='pad')
+    close['position'] = close['position'].fillna(method='pad')
+    close['notional'] = close['notional'].fillna(method='pad')
+    close['pnl'] = close['pnl'].fillna(method='pad')
+     
     close['model'] = model
+
     model_run_result = collections.namedtuple('ModelRunResult', ['positions', 'notionals', 'pnl'])
     
     return model_run_result(positions = close[['model', 'position']], notionals = close[['model', 'notional']], pnl = close[['model', 'pnl']])
     
     
-def generate_signal(data):
+def generate_signal(data, quandl_id):
     logger.info('Calculating 20-day moving average quandl_id='+ quandl_id)
     ma50 = movingaverage(data['close'] , 50)
     logger.info('Calculating 50-day moving average quandl_id='+ quandl_id)

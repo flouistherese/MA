@@ -118,7 +118,7 @@ def apply_model_gearing(close, gearing_factor, instrument, capital):
     
 def update_pnl(close, instrument, slippage = 0.005, capital = 100E6):
     pnl = calculate_pnl(close, instrument, slippage)
-    close['pnl'] = pad(pnl, len(close) - pnl.size, float(0))
+    close['pnl'] = pad(pnl, len(close) - pnl.size, float('nan'))
     close['daily_pnl'] = close['pnl'].diff()
     close['daily_pnl_pct'] = close['daily_pnl'] / capital
     
@@ -153,6 +153,8 @@ def plot_total_pnl(pnl):
     plt.title('Total PnL')
     plt.ylabel('PnL in USD')
     plt.plot(total_pnl)
+
+    
 #'YAHOO/AAPL'
 #'CHRIS/CME_CL1'
 #plt.plot(data['Open'])

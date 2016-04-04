@@ -6,6 +6,7 @@ Created on Sat Mar 12 18:32:23 2016
 """
 import os
 import csv
+import array
 import datetime as dt
 import time
 from time import strftime
