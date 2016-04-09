@@ -9,8 +9,19 @@ def calculate_positions(model, quandl_id, instrument, point_value, logger, confi
 ####
     
     logger.info('Getting Quandl data quandl_id='+quandl_id)
-    data = getHistoricalData(quandl_id, logger)    
+    if live_data_enabled:
+        logger.info('Downloading data from Quandl quandl_id='+ quandl_id)
+        data = getHistoricalData(quandl_id, logger)    
+    else:
+        file_path = market_data_dir + instrument +'.csv'
+        logger.info('Reading data from '+file_path+' quandl_id='+ quandl_id)
+        data = pd.DataFrame.from_csv(file_path)
     
+    if store_market_data:
+        file_path= market_data_dir + instrument +'.csv'
+        logger.info('Storing data to '+file_path+' quandl_id='+ quandl_id)
+        data.to_csv(file_path)
+        
     close = data[['Last']]['1/1/2005':]
     close.columns = ['close']
     
@@ -73,15 +84,17 @@ def calculate_positions(model, quandl_id, instrument, point_value, logger, confi
     
     
 def generate_signal(data, quandl_id):
-    logger.info('Calculating 20-day moving average quandl_id='+ quandl_id)
-    ma50 = movingaverage(data['close'] , 50)
-    logger.info('Calculating 50-day moving average quandl_id='+ quandl_id)
-    ma100 = movingaverage(data['close'] , 100)
-    data['ma50'] = pad(ma50, len(data) - ma50.size, float('nan'))
-    data['ma100'] = pad(ma100, len(data) - ma100.size, float('nan'))
+    ma1 = int(config.get('StrategySettings','ma1'))
+    ma2 = int(config.get('StrategySettings','ma2'))
+    logger.info('Calculating '+str(ma1)+'-day moving average quandl_id='+ quandl_id)
+    ma1 = movingaverage(data['close'] , ma1)
+    logger.info('Calculating '+str(ma2)+'-day moving average quandl_id='+ quandl_id)
+    ma2 = movingaverage(data['close'] , ma2)
+    data['ma1'] = pad(ma1, len(data) - ma1.size, float('nan'))
+    data['ma2'] = pad(ma2, len(data) - ma2.size, float('nan'))
     
     logger.info('Calculating historical signals quandl_id='+quandl_id)
-    data['signal'] = np.sign(data['ma50'] - data['ma100'])
+    data['signal'] = np.sign(data['ma1'] - data['ma2'])
     data['signal'][np.isnan(data['signal'])] = 0
     
     return data
