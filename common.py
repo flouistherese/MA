@@ -23,8 +23,8 @@ def movingaverage (values, window):
 def pad(array, width, value):
     return np.lib.pad(array, (width,0), mode = 'constant', constant_values= value)
     
-def trade_size(signal, capital, vol, price):
-    return round(0.001 * signal * capital / (vol*price))
+def trade_size(signal, capital, vol, price, point_value):
+    return round(0.001 * signal * capital / (vol*point_value))
     
 def store_positions(close, positions_path, instrument, quandl_id, logger):
     positions_directory_path = positions_path + strftime("%Y-%m-%d")
@@ -63,15 +63,15 @@ def plot_pnl(close, model):
     plt.ylabel('vol')
     plt.show()
     
-def calculate_pnl(close, instrument, slippage):
+def calculate_pnl(close, instrument, point_value, slippage):
     pnl = np.array([])
     positions = close[close['signal'] != 0][ - np.isnan(close['vol'])]
-    pnl_snapshot = PnlSnapshot(instrument, np.sign(positions.ix[0].trade), positions.ix[0].close, abs(positions.ix[0].trade))
+    pnl_snapshot = PnlSnapshot(instrument, np.sign(positions.ix[0].trade), positions.ix[0].close, abs(positions.ix[0].trade * point_value))
     row_number = 0
     for index, row in positions.iterrows():
         if row_number > 0:
             fill_price = row['close'] + np.sign(row['trade']) * slippage
-            pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), fill_price , abs(row['trade']))
+            pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), fill_price , abs(row['trade'] * point_value))
             pnl_snapshot.update_by_marketdata(row['close'])
             pnl = np.append(pnl, pnl_snapshot.m_total_pnl - row['transaction_cost'])
         row_number += 1
@@ -107,34 +107,38 @@ def calculate_model_gearing(pnl, capital = 100E6, vol_target = 0.15, window = 25
     
     return gearing_factor
     
-def apply_model_gearing(close, gearing_factor, instrument, capital):
+def apply_model_gearing(close, gearing_factor, instrument, point_value, capital):
     close['position'] = close['position'] * gearing_factor
     close['trade'] = close['trade'] * gearing_factor
-    close['notional'] = calculate_notional_positions(close)
+    close['notional'] = calculate_notional_positions(close, point_value)
     close['transaction_cost'] = close.apply(lambda row: abs(row['trade'] * transaction_cost) , axis=1)
     
-    close = update_pnl(close, instrument, slippage, capital)
+    close = update_pnl(close, instrument, point_value, slippage, capital)
     return close
     
-def update_pnl(close, instrument, slippage = 0.005, capital = 100E6):
-    pnl = calculate_pnl(close, instrument, slippage)
+def update_pnl(close, instrument, point_value, slippage = 0.005, capital = 100E6):
+    pnl = calculate_pnl(close, instrument, point_value, slippage)
     close['pnl'] = pad(pnl, len(close) - pnl.size, float('nan'))
     close['daily_pnl'] = close['pnl'].diff()
     close['daily_pnl_pct'] = close['daily_pnl'] / capital
     
     return close
 
-def calculate_volatility(data, window):
+def calculate_pct_volatility(data, window):
     pct_change = data.pct_change()
     return pd.rolling_std(pct_change, window)
+
+def calculate_change_volatility(data, window):
+    change = data.diff()
+    return pd.rolling_std(change, window)
     
-def calculate_historical_positions(data):
-    positions = data.apply(lambda row: trade_size(row['signal'], capital, row['vol'], row['close']), axis=1)
+def calculate_historical_positions(data, point_value):
+    positions = data.apply(lambda row: trade_size(row['signal'], capital, row['vol'], row['close'], point_value), axis=1)
     positions[np.isnan(positions)] = 0
     return positions
 
-def calculate_notional_positions(data):
-    return data.apply(lambda row: row['position'] * row['close'] , axis=1)
+def calculate_notional_positions(data, point_value):
+    return data.apply(lambda row: row['position'] * row['close'] * point_value , axis=1)
     
 def calculate_transaction_costs(data, transaction_cost):
     return data.apply(lambda row: abs(row['trade'] * transaction_cost) , axis=1)
@@ -147,8 +151,7 @@ def plot_pnl_by_model(pnl):
     plt.ylabel('PnL in USD')
     plt.legend()
     
-def plot_total_pnl(pnl):
-    total_pnl = pnl.groupby(pnl.index).sum()
+def plot_total_pnl(total_pnl):
     plt.figure()
     plt.title('Total PnL')
     plt.ylabel('PnL in USD')

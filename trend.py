@@ -1,26 +1,28 @@
-def calculate_positions(model, quandl_id, instrument, logger, config):
+def calculate_positions(model, quandl_id, instrument, point_value, logger, config):
 
 ####TEST CONFIG
-#    model = 'EQUITY_TREND_FB'
-#    quandl_id = 'YAHOO/QCOM'
-#    instrument = 'QCOM'
+#    model = 'COMMODITY_TREND_TY'
+#    quandl_id = 'CHRIS/CME_TY1'
+#    instrument = 'TY'
+#    point_value = 1000
 #    config.read("config/engine.config")
 ####
     
     logger.info('Getting Quandl data quandl_id='+quandl_id)
     data = getHistoricalData(quandl_id, logger)    
     
-    close = data[['Adjusted Close']]['1/1/2005':]
+    close = data[['Last']]['1/1/2005':]
     close.columns = ['close']
     
     volatility_window = float(config.get('StrategySettings', 'volatility_window'))
     logger.info('Calculating '+ str(volatility_window) +'-day volatility quandl_id='+quandl_id)
-    close['vol'] = calculate_volatility(close, volatility_window)
+    close['vol'] = calculate_pct_volatility(close, volatility_window)
+    close['vol'] = calculate_change_volatility(close, volatility_window)
     
     close = generate_signal(close, quandl_id)
 
     logger.info('Calculating historical positions quandl_id='+ quandl_id)
-    close['position'] = calculate_historical_positions(close) 
+    close['position'] = calculate_historical_positions(close, point_value) 
     
     if store_positions:
         store_positions(close, positions_path, instrument, quandl_id, logger)
@@ -28,13 +30,13 @@ def calculate_positions(model, quandl_id, instrument, logger, config):
     close['trade'] = close[['position']].diff()
     
     logger.info('Calculating notional positions quandl_id='+ quandl_id)
-    close['notional'] = calculate_notional_positions(close)
+    close['notional'] = calculate_notional_positions(close, point_value)
 
     logger.info('Calculating transaction costs quandl_id='+ quandl_id)
     close['transaction_cost'] = calculate_transaction_costs(close, transaction_cost)
     
     logger.info('Calculating ungeared pnl quandl_id='+ quandl_id)
-    close = update_pnl(close, instrument, slippage, capital)
+    close = update_pnl(close, instrument, point_value, slippage, capital)
     
     #plot_pnl(close,instrument)
     
@@ -42,7 +44,7 @@ def calculate_positions(model, quandl_id, instrument, logger, config):
     gearing_factor = calculate_model_gearing(close['pnl'], capital = capital, vol_target = vol_target )
     
     logger.info('Apply gearing factor = '+ str(gearing_factor) +' quandl_id='+ quandl_id)    
-    close = apply_model_gearing(close, gearing_factor, instrument, capital)
+    close = apply_model_gearing(close, gearing_factor, instrument, point_value, capital)
     
     risk_free_rate = float(config.get('StrategySettings', 'risk_free_rate'))
     

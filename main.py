@@ -24,15 +24,21 @@ signals_path = config.get('StrategySettings','signals_path')
 positions = pd.DataFrame()
 notionals = pd.DataFrame()
 pnl = pd.DataFrame()
-models_reduced = models[1:20]
 
-for index, row in models_reduced.iterrows():
+for index, row in models.iterrows():
     logger.info('Processing '+ row['model'] +' '+row['instrument_type']+' '+ row['instrument']+' quandl_id='+row['quandl_id'])
-    result = calculate_positions(row['model'], row['quandl_id'], row['instrument'], logger, config)
+    result = calculate_positions(row['model'], row['quandl_id'], row['instrument'], row['point_value'], logger, config)
     positions = pd.concat([positions, result.positions])
     notionals = pd.concat([notionals, result.notionals])
     pnl = pd.concat([pnl, result.pnl])
     
 plot_pnl_by_model(pnl)
     
-plot_total_pnl(pnl)
+total_pnl = pnl.groupby(pnl.index).sum()
+plot_total_pnl(total_pnl)
+
+total_pnl['daily_pnl'] = total_pnl['pnl'].diff()
+total_pnl['daily_pnl_pct'] = total_pnl['daily_pnl'] / capital
+
+sharpe_ratio = annualised_sharpe(total_pnl['daily_pnl_pct'], risk_free_rate = 0.0)
+    
