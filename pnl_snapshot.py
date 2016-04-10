@@ -13,7 +13,7 @@ class PnlSnapshot:
     def update_by_tradefeed(self, buy_or_sell, traded_price, traded_quantity):
         # buy: positive position, sell: negative position
         quantity_with_direction = traded_quantity if buy_or_sell == 1 else (-1) * traded_quantity
-        is_still_open = (self.m_net_position * quantity_with_direction) >= 0
+        is_still_open = abs(self.m_net_position + quantity_with_direction) > 0
         # net investment
         self.m_net_investment = max( self.m_net_investment, abs( self.m_net_position * self.m_avg_open_price  ) )
         # realized pnl

@@ -1,9 +1,11 @@
 def calculate_positions(model, quandl_id, instrument, point_value, logger, config):
 
+    pd.options.mode.chained_assignment = None  # default='warn'
+
 ####TEST CONFIG
 #    model = 'COMMODITY_TREND_TY'
 #    quandl_id = 'CHRIS/CME_TY1'
-#    instrument = 'TY'
+#    instrument = 'TY1'
 #    point_value = 1000
 #    config.read("config/engine.config")
 ####
@@ -22,14 +24,19 @@ def calculate_positions(model, quandl_id, instrument, point_value, logger, confi
         logger.info('Storing data to '+file_path+' quandl_id='+ quandl_id)
         data.to_csv(file_path)
         
-    close = data[['Last']]['1/1/2005':]
+    data = data['1/1/2005':]
+    
+    ATR = calculate_average_true_range(data, atr_period)
+    
+    close = data[['Last']]
     close.columns = ['close']
     
     volatility_window = float(config.get('StrategySettings', 'volatility_window'))
     logger.info('Calculating '+ str(volatility_window) +'-day volatility quandl_id='+quandl_id)
-    close['vol'] = calculate_pct_volatility(close, volatility_window)
-    close['vol'] = calculate_change_volatility(close, volatility_window)
+    close.loc[:,('vol')] = calculate_pct_volatility(close.loc[:,('close')], volatility_window)
+    close.loc[:,('vol')] = calculate_change_volatility(close.loc[:,('close')], volatility_window)
     
+    close.loc[:,('ATR')] = ATR
     close = generate_signal(close, quandl_id)
 
     logger.info('Calculating historical positions quandl_id='+ quandl_id)
@@ -69,6 +76,7 @@ def calculate_positions(model, quandl_id, instrument, point_value, logger, confi
     
     
     #plot_pnl(close,model)
+    #plot_pnl_atr(close,model)
     date_range = pd.date_range(close.index.min(),close.index.max())
     close = close.reindex(date_range)
     close['close'] = close['close'].fillna(method='pad')
@@ -94,7 +102,10 @@ def generate_signal(data, quandl_id):
     data['ma2'] = pad(ma2, len(data) - ma2.size, float('nan'))
     
     logger.info('Calculating historical signals quandl_id='+quandl_id)
-    data['signal'] = np.sign(data['ma1'] - data['ma2'])
+    data['signal'] = data['ma1'] - data['ma2']
+    if use_atr:
+        data.ix[abs(data.signal)< (data.ATR * number_atr), 'signal'] = 0
     data['signal'][np.isnan(data['signal'])] = 0
+    data['signal'] = np.sign(data['signal'])
     
     return data

@@ -34,44 +34,56 @@ def store_positions(close, positions_path, instrument, quandl_id, logger):
     logger.info('Storing positions to '+positions_file_path+' quandl_id='+ quandl_id)
     close[['close','position']].to_csv(positions_file_path,mode  = 'w+')
 
-def plot_signals(close):
-    plt.figure()
+
+#def plot_pnl(close, model):
+#    plt.figure()
+#    plt.ion()
+#    
+#    plt.subplot(411)
+#    plt.plot(close['close'], ls = '-')
+#    plt.plot(close['ma1'], ls = '-')
+#    plt.plot(close['ma2'], ls = '-')
+#    plt.title(model)
+#    plt.ylabel('Price')
+#    plt.subplot(412)
+#    plt.plot(close['pnl'])
+#    plt.ylabel('PnL')
+#    plt.subplot(413)
+#    plt.plot(close['notional'])
+#    plt.ylabel('Notional')
+#    plt.subplot(414)
+#    plt.plot(close['vol'])
+#    plt.ylabel('vol')
+#    plt.show()
+    
+def plot_pnl(close, model):
     plt.ion()
-    plt.plot(close['close'], ls = '-')
-    plt.plot(close['ma20'], ls = '-')
-    plt.plot(close['ma100'], ls = '-')
+    f, (ax1, ax2, ax3,ax4) = plt.subplots(4, 1, sharex=True)
+    ax1.plot(close['close'], ls = '-')
+    ax1.plot(close['ma1'], ls = '-')
+    ax1.plot(close['ma2'], ls = '-')
+    ax1.set_title(model)
+    ax1.set_ylabel('Price')
+    ax2.plot(close['pnl'])
+    ax2.set_ylabel('PnL')
+    ax3.plot(close['notional'])
+    ax3.set_ylabel('Notional')
+    ax4.plot(close['vol'])
+    ax4.set_ylabel('vol')
     plt.show()
 
-def plot_pnl(close, model):
-    plt.figure()
-    plt.ion()
-    
-    plt.subplot(411)
-    plt.plot(close['close'], ls = '-')
-    plt.plot(close['ma50'], ls = '-')
-    plt.plot(close['ma100'], ls = '-')
-    plt.title(model)
-    plt.ylabel('Price')
-    plt.subplot(412)
-    plt.plot(close['pnl'])
-    plt.ylabel('PnL')
-    plt.subplot(413)
-    plt.plot(close['notional'])
-    plt.ylabel('Notional')
-    plt.subplot(414)
-    plt.plot(close['vol'])
-    plt.ylabel('vol')
-    plt.show()
     
 def calculate_pnl(close, instrument, point_value, slippage):
     pnl = np.array([])
-    positions = close[close['signal'] != 0][ - np.isnan(close['vol'])]
+    first_position = close[close['position'] != 0].index[0]
+    positions = close[first_position:][ - np.isnan(close['vol'])]
     pnl_snapshot = PnlSnapshot(instrument, np.sign(positions.ix[0].trade), positions.ix[0].close, abs(positions.ix[0].trade * point_value))
     row_number = 0
     for index, row in positions.iterrows():
         if row_number > 0:
             fill_price = row['close'] + np.sign(row['trade']) * slippage
-            pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), fill_price , abs(row['trade'] * point_value))
+            if abs(row['trade'] ) > 0:
+                pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), fill_price , abs(row['trade'] * point_value))
             pnl_snapshot.update_by_marketdata(row['close'])
             pnl = np.append(pnl, pnl_snapshot.m_total_pnl - row['transaction_cost'])
         row_number += 1
@@ -124,12 +136,12 @@ def update_pnl(close, instrument, point_value, slippage = 0.005, capital = 100E6
     
     return close
 
-def calculate_pct_volatility(data, window):
-    pct_change = data.pct_change()
+def calculate_pct_volatility(price, window):
+    pct_change = price.pct_change()
     return pd.rolling_std(pct_change, window)
 
-def calculate_change_volatility(data, window):
-    change = data.diff()
+def calculate_change_volatility(price, window):
+    change = price.diff()
     return pd.rolling_std(change, window)
     
 def calculate_historical_positions(data, point_value):
@@ -156,6 +168,27 @@ def plot_total_pnl(total_pnl):
     plt.title('Total PnL')
     plt.ylabel('PnL in USD')
     plt.plot(total_pnl)
+    
+def calculate_average_true_range (data, period):
+    ATR1 = abs (data.loc[:,('High')] - data.loc[:,('Low')])
+    ATR2 = abs (data.loc[:,('High')] - data.loc[:,('Last')].shift())
+    ATR3 = abs (data.loc[:,('Low')] - data.loc[:,('Last')].shift())
+    TR = pd.concat([ATR1, ATR2, ATR3], axis = 1)
+    true_range = TR[[0,1, 2]].max(axis=1)
+    
+    ATR = np.concatenate((np.repeat(float('nan'), period -1), [np.mean(true_range[0:period])]))
+    for index in range(period, len(data)):
+        latest_atr = (ATR[index - 1] * (period -1) + true_range[index])/ period
+        ATR= np.append(ATR, latest_atr)
+    
+    return ATR
+    
+def print_full(x):
+    pd.set_option('display.max_rows', len(x))
+    print(x)
+    pd.reset_option('display.max_rows')
+    
+    
 
     
 #'YAHOO/AAPL'
