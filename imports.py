@@ -21,3 +21,5 @@ import numpy as np
 import pickle
 import collections
 import pdb
+from scipy.stats import norm
+import matplotlib.mlab as mlab

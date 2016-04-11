@@ -3,11 +3,12 @@ def calculate_positions(model, quandl_id, instrument, point_value, logger, confi
     pd.options.mode.chained_assignment = None  # default='warn'
 
 ####TEST CONFIG
-#    model = 'COMMODITY_TREND_TY'
-#    quandl_id = 'CHRIS/CME_TY1'
-#    instrument = 'TY1'
+#    model = 'COMMODITY_TREND_CL'
+#    quandl_id = 'CHRIS/CME_CL1'
+#    instrument = 'CL1'
 #    point_value = 1000
 #    config.read("config/engine.config")
+#    use_atr = False
 ####
     
     logger.info('Getting Quandl data quandl_id='+quandl_id)
@@ -27,6 +28,7 @@ def calculate_positions(model, quandl_id, instrument, point_value, logger, confi
     data = data['1/1/2005':]
     
     ATR = calculate_average_true_range(data, atr_period)
+    (ATR_mean, ATR_std_dev) = atr_gaussian_fitting(ATR, display = False)
     
     close = data[['Last']]
     close.columns = ['close']
@@ -37,7 +39,7 @@ def calculate_positions(model, quandl_id, instrument, point_value, logger, confi
     close.loc[:,('vol')] = calculate_change_volatility(close.loc[:,('close')], volatility_window)
     
     close.loc[:,('ATR')] = ATR
-    close = generate_signal(close, quandl_id)
+    close = generate_signal(close, ATR_mean, ATR_std_dev, quandl_id)
 
     logger.info('Calculating historical positions quandl_id='+ quandl_id)
     close['position'] = calculate_historical_positions(close, point_value) 
@@ -91,7 +93,7 @@ def calculate_positions(model, quandl_id, instrument, point_value, logger, confi
     return model_run_result(positions = close[['model', 'position']], notionals = close[['model', 'notional']], pnl = close[['model', 'pnl']])
     
     
-def generate_signal(data, quandl_id):
+def generate_signal(data, ATR_mean, ATR_std_dev, quandl_id):
     ma1 = int(config.get('StrategySettings','ma1'))
     ma2 = int(config.get('StrategySettings','ma2'))
     logger.info('Calculating '+str(ma1)+'-day moving average quandl_id='+ quandl_id)
@@ -104,7 +106,9 @@ def generate_signal(data, quandl_id):
     logger.info('Calculating historical signals quandl_id='+quandl_id)
     data['signal'] = data['ma1'] - data['ma2']
     if use_atr:
-        data.ix[abs(data.signal)< (data.ATR * number_atr), 'signal'] = 0
+        #How many std dev away from the mean
+        data['atr_coefficient'] = np.ceil(abs(data.ATR - ATR_mean)/ATR_std_dev)
+        data.ix[abs(data.signal)< (data.ATR * data['atr_coefficient']), 'signal'] = 0
     data['signal'][np.isnan(data['signal'])] = 0
     data['signal'] = np.sign(data['signal'])
     

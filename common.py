@@ -188,6 +188,19 @@ def print_full(x):
     print(x)
     pd.reset_option('display.max_rows')
     
+def atr_gaussian_fitting(ATR, display = False):
+    ATR_clean = ATR[- np.isnan(ATR)]
+    (mu, sigma) = norm.fit(ATR_clean)
+    if display:
+        n, bins, patches = plt.hist(ATR_clean, 60, normed=1, facecolor='green', alpha=0.75)
+        y = mlab.normpdf( bins, mu, sigma)
+        l = plt.plot(bins, y, 'r--', linewidth=2)
+        plt.xlabel('ATR')
+        plt.ylabel('Probability')
+        plt.title(r'$\mathrm{Histogram\ of\ ATR:}\ \mu=%.3f,\ \sigma=%.3f$' %(mu, sigma))
+        plt.grid(True)
+        plt.show()
+    return (mu, sigma)
     
 
     
