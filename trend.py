@@ -29,18 +29,18 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     data = data['1/1/2005':]
     
     ATR = calculate_average_true_range(data, atr_period)
-    (ATR_mean, ATR_std_dev) = atr_gaussian_fitting(ATR, display = False)
     
     close = data[['Last']]
     close.columns = ['close']
+    
+    close = historical_atr_gaussian_fitting(close, ATR)
     
     volatility_window = float(config.get('StrategySettings', 'volatility_window'))
     logger.info('Calculating '+ str(volatility_window) +'-day volatility instrument_id='+instrument_id)
     close.loc[:,('vol')] = calculate_pct_volatility(close.loc[:,('close')], volatility_window)
     close.loc[:,('vol')] = calculate_change_volatility(close.loc[:,('close')], volatility_window)
     
-    close.loc[:,('ATR')] = ATR
-    close = generate_signal(close, ATR_mean, ATR_std_dev, instrument_id)
+    close = generate_signal(close, instrument_id)
 
     logger.info('Calculating historical positions instrument_id='+ instrument_id)
     close['position'] = calculate_historical_positions(close, point_value) 
@@ -95,7 +95,7 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     return model_run_result(positions = close[['model', 'position']], notionals = close[['model', 'notional']], pnl = close[['model', 'pnl']])
     
     
-def generate_signal(data, ATR_mean, ATR_std_dev, instrument_id):
+def generate_signal(data, instrument_id):
     ma1 = int(config.get('StrategySettings','ma1'))
     ma2 = int(config.get('StrategySettings','ma2'))
     logger.info('Calculating '+str(ma1)+'-day moving average instrument_id='+ instrument_id)
@@ -109,7 +109,7 @@ def generate_signal(data, ATR_mean, ATR_std_dev, instrument_id):
     data['signal'] = data['ma1'] - data['ma2']
     if use_atr:
         #How many std dev away from the mean
-        data['atr_coefficient'] = np.ceil(abs(data.ATR - ATR_mean)/ATR_std_dev)
+        data['atr_coefficient'] = np.ceil(abs(data.ATR - data.ATR_mean)/data.ATR_std)
         data.ix[abs(data.signal)< (data.ATR * data['atr_coefficient']), 'signal'] = 0
     data['signal'][np.isnan(data['signal'])] = 0
     data['signal'] = np.sign(data['signal'])

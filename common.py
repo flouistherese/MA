@@ -207,6 +207,20 @@ def atr_gaussian_fitting(ATR, display = False):
         plt.show()
     return (mu, sigma)
     
+def historical_atr_gaussian_fitting(data, ATR, display = False):
+    data.loc[:,('ATR')] = ATR
+    data.loc[:,('ATR_mean')] = float('nan')
+    data.loc[:,('ATR_std')] = float('nan')
+    for index in range(0, len(data)):
+        if(np.isnan(ATR[index])):
+            data['ATR_mean'][index] = float('nan')
+            data['ATR_std'][index] = float('nan')
+        else:
+            (ATR_mean, ATR_std_dev) = atr_gaussian_fitting(ATR[0:index], display = False)
+            data['ATR_mean'][index] =ATR_mean
+            data['ATR_std'][index] =ATR_std_dev
+    return(data)
+    
 
     
 #'YAHOO/AAPL'
