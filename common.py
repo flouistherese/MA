@@ -9,11 +9,16 @@ def createLogger(logfile_path):
     logger.setLevel(logging.INFO)
     return logger
     
-def getHistoricalData(ticker, logger, period = 'daily'):  
-    try:
-        return Quandl.get(ticker, collapse=period, authtoken = api_key)
-    except Exception as e:
-        logger.exception("message")
+def getHistoricalData(ticker, instrument_type, logger, period = 'daily'):  
+    if instrument_type == 'FUTURE':
+        try:
+            return Quandl.get(ticker, collapse=period, authtoken = api_key)
+        except Exception as e:
+            logger.exception("message")
+    elif instrument_type == 'BTC_PAIR' :
+        data = p.returnChartData(currencyPair = ticker)
+        data.columns = ['Last', 'High', 'Low','Open','quoteVolume', 'volume', 'weightedAverage']
+        return data
     
 def movingaverage (values, window):
     weights = np.repeat(1.0, window)/window
@@ -26,12 +31,12 @@ def pad(array, width, value):
 def trade_size(signal, capital, vol, price, point_value):
     return round(0.001 * signal * capital / (vol*point_value))
     
-def store_positions(close, positions_path, instrument, quandl_id, logger):
+def store_positions(close, positions_path, instrument, instrument_id, logger):
     positions_directory_path = positions_path + strftime("%Y-%m-%d")
     if not os.path.exists(positions_directory_path):
         os.makedirs(positions_directory_path)
     positions_file_path = positions_directory_path + '/' + instrument + '_' + strftime("%Y-%m-%d_%H-%M-%S") + '.csv'
-    logger.info('Storing positions to '+positions_file_path+' quandl_id='+ quandl_id)
+    logger.info('Storing positions to '+positions_file_path+' instrument_id='+ instrument_id)
     close[['close','position']].to_csv(positions_file_path,mode  = 'w+')
 
 
@@ -81,7 +86,7 @@ def calculate_pnl(close, instrument, point_value, slippage):
     row_number = 0
     for index, row in positions.iterrows():
         if row_number > 0:
-            fill_price = row['close'] + np.sign(row['trade']) * slippage
+            fill_price = row['close'] + np.sign(row['trade']) * row['close'] * slippage
             if abs(row['trade'] ) > 0:
                 pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), fill_price , abs(row['trade'] * point_value))
             pnl_snapshot.update_by_marketdata(row['close'])
@@ -123,7 +128,7 @@ def apply_model_gearing(close, gearing_factor, instrument, point_value, capital)
     close['position'] = close['position'] * gearing_factor
     close['trade'] = close['trade'] * gearing_factor
     close['notional'] = calculate_notional_positions(close, point_value)
-    close['transaction_cost'] = close.apply(lambda row: abs(row['trade'] * transaction_cost) , axis=1)
+    close['transaction_cost'] = close.apply(lambda row: abs(row['trade'] * row['close']* transaction_cost) , axis=1)
     
     close = update_pnl(close, instrument, point_value, slippage, capital)
     return close
@@ -153,7 +158,7 @@ def calculate_notional_positions(data, point_value):
     return data.apply(lambda row: row['position'] * row['close'] * point_value , axis=1)
     
 def calculate_transaction_costs(data, transaction_cost):
-    return data.apply(lambda row: abs(row['trade'] * transaction_cost) , axis=1)
+    return data.apply(lambda row: abs(row['trade'] * row['close'] * transaction_cost) , axis=1)
     
 def plot_pnl_by_model(pnl):
     fig, ax = plt.subplots(figsize=(8,6))

@@ -1,4 +1,4 @@
-model,instrument_type,instrument,quandl_id,point_value
+model,instrument_type,instrument,id,point_value
 ENERGY_TREND_CL,FUTURE,CL1,CHRIS/CME_CL1,1000
 ENERGY_TREND_NG,FUTURE,NG1,CHRIS/CME_NG1,10000
 METAL_TREND_GC,FUTURE,GC1,CHRIS/CME_GC1,100

@@ -2,6 +2,7 @@ import os
 os.chdir('H:/Dropbox/Dropbox/Code/Python/strategies/MA/')
 
 execfile('imports.py')
+execfile('poloniex_api.py')
 execfile('common.py')
 execfile('trend.py')
 execfile('pnl_snapshot.py')
@@ -30,10 +31,11 @@ number_atr = int(config.get('StrategySettings','number_atr'))
 positions = pd.DataFrame()
 notionals = pd.DataFrame()
 pnl = pd.DataFrame()
+p = poloniex(poloniex_api_key, poloniex_secret)
 
 for index, row in models.iterrows():
-    logger.info('Processing '+ row['model'] +' '+row['instrument_type']+' '+ row['instrument']+' quandl_id='+row['quandl_id'])
-    result = calculate_positions(row['model'], row['quandl_id'], row['instrument'], row['point_value'], logger, config)
+    logger.info('Processing '+ row['model'] +' '+row['instrument_type']+' '+ row['instrument']+' id='+row['id'])
+    result = calculate_positions(row['model'], row['id'], row['instrument'], row['instrument_type'],row['point_value'], logger, config)
     positions = pd.concat([positions, result.positions])
     notionals = pd.concat([notionals, result.notionals])
     pnl = pd.concat([pnl, result.pnl])
