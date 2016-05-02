@@ -5,3 +5,12 @@ TODO:
 - Create and continuously update PnL spreadsheet (separate thread?)
 - Create a Trade History spreadsheet
 - Allow the algo to run without downloading all the historical data each time
+- Apply gearing at the portfolio level
+- Tidying up code
+
+
+
+Ideas:
+- Intraday trend following
+- Arbitrage between exchanges
+- Market Making on one exchange
