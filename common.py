@@ -29,7 +29,8 @@ def pad(array, width, value):
     return np.lib.pad(array, (width,0), mode = 'constant', constant_values= value)
     
 def trade_size(signal, capital, vol, price, point_value):
-    return round(0.001 * signal * capital / (vol*point_value))
+    #return round(0.001 * signal * capital / (vol*point_value))
+    return round(signal * capital / (vol*point_value))
     
 def store_positions(close, positions_path, instrument, instrument_id, logger):
     positions_directory_path = positions_path + strftime("%Y-%m-%d")
@@ -39,27 +40,6 @@ def store_positions(close, positions_path, instrument, instrument_id, logger):
     logger.info('Storing positions to '+positions_file_path+' instrument_id='+ instrument_id)
     close[['close','position']].to_csv(positions_file_path,mode  = 'w+')
 
-
-#def plot_pnl(close, model):
-#    plt.figure()
-#    plt.ion()
-#    
-#    plt.subplot(411)
-#    plt.plot(close['close'], ls = '-')
-#    plt.plot(close['ma1'], ls = '-')
-#    plt.plot(close['ma2'], ls = '-')
-#    plt.title(model)
-#    plt.ylabel('Price')
-#    plt.subplot(412)
-#    plt.plot(close['pnl'])
-#    plt.ylabel('PnL')
-#    plt.subplot(413)
-#    plt.plot(close['notional'])
-#    plt.ylabel('Notional')
-#    plt.subplot(414)
-#    plt.plot(close['vol'])
-#    plt.ylabel('vol')
-#    plt.show()
     
 def plot_pnl(close, model):
     plt.ion()
@@ -220,9 +200,54 @@ def historical_atr_gaussian_fitting(data, ATR, display = False):
             data['ATR_mean'][index] =ATR_mean
             data['ATR_std'][index] =ATR_std_dev
     return(data)
-    
 
+def generate_trades(current_positions_file, base_positions, base_capital, real_capital):
+    current_positions = pd.DataFrame.from_csv(current_positions_file,index_col = None)
+    positions_today = base_positions[time.strftime("%m/%d/%Y")]
+    positions_today.columns = ['model', 'price', 'instrument_id', 'target_position']
+    positions_today['target_position'] = positions_today.target_position * real_capital/float(base_capital)
+    positions_today = positions_today.merge(current_positions, how='left', on = 'model' )
+    positions_today['trade'] = positions_today.target_position - positions_today.current_position
+    if(long_only):
+        positions_today['trade'] = np.where(positions_today.trade < 0, 0, positions_today.trade)
+    return(positions_today)
     
+def apply_limits(close, instrument, point_value, slippage, capital, limits):
+    close = close.reset_index().merge(limits, how='left', on = 'model' ).set_index('date')
+    close['limit_scaling'] = np.where(abs(close.notional) > close.limit, np.sign(close.notional)*close.limit/close.notional, 1 )
+    close['position'] = close.position * close.limit_scaling
+    close['trade'] = close.trade * close.limit_scaling
+    close['notional'] = close.notional * close.limit_scaling
+    close['transaction_cost'] = close.transaction_cost * close.limit_scaling
+    close = update_pnl(close, instrument, point_value, slippage, capital)
+    return(close)
+    
+def execute_trades(trades):
+    trades_to_execute = trades[trades['trade'] > 0].reset_index()
+    for index in range(0, len(trades_to_execute)):
+        order_id = place_order(trades_to_execute['instrument_id'][index], trades_to_execute['price'][index], trades_to_execute['trade'][index])
+    #TODO: Keep track of order        
+    
+        
+def place_order(currency_pair, rate, amount):
+    if(amount > 0):
+        amount = round(amount,5)
+        orderId = p.buy(currency_pair,rate,amount)
+        logger.info('ORDER PLACED: ID= '+ str(orderId)+'  [BUY '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]')
+    else:
+        amount = round(amount,5)
+        orderId = p.sell(currency_pair,rate,amount)
+        logger.info('ORDER PLACED: ID= '+ str(orderId)+'  [SELL '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]')
+    return(orderId)
+
+def update_positions(current_positions_file):
+    balances_raw = p.returnBalances()
+    balances = pd.DataFrame.from_dict(balances_raw, orient = 'index').reset_index()
+    balances.columns = ['currency', 'current_position']
+    balances['model'] = "BTC_TREND_" + balances.currency
+    balances = balances.sort_values(by = 'currency')
+    balances = balances[['model','currency','current_position']]
+    balances.to_csv(current_positions_file, index = False)
 #'YAHOO/AAPL'
 #'CHRIS/CME_CL1'
 #plt.plot(data['Open'])

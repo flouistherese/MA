@@ -3,9 +3,9 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     pd.options.mode.chained_assignment = None  # default='warn'
 
 ####TEST CONFIG
-#    model = 'BTC_TREND_ETH'
-#    instrument_id = 'BTC_ETH'
-#    instrument = 'BTC_ETH'
+#    model = 'BTC_TREND_XEM'
+#    instrument_id = 'BTC_XEM'
+#    instrument = 'BTC_XEM'
 #    instrument_type = 'BTC_PAIR'
 #    point_value = 1
 #    config.read("config/engine.config")
@@ -32,21 +32,23 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     
     close = data[['Last']]
     close.columns = ['close']
+    close['model'] = model
+    close['instrument_id'] = instrument_id
     
     close = historical_atr_gaussian_fitting(close, ATR)
     
     volatility_window = float(config.get('StrategySettings', 'volatility_window'))
     logger.info('Calculating '+ str(volatility_window) +'-day volatility instrument_id='+instrument_id)
     close.loc[:,('vol')] = calculate_pct_volatility(close.loc[:,('close')], volatility_window)
-    close.loc[:,('vol')] = calculate_change_volatility(close.loc[:,('close')], volatility_window)
+    #close.loc[:,('vol')] = calculate_change_volatility(close.loc[:,('close')], volatility_window)
     
     close = generate_signal(close, instrument_id)
 
     logger.info('Calculating historical positions instrument_id='+ instrument_id)
     close['position'] = calculate_historical_positions(close, point_value) 
     
-    if store_positions:
-        store_positions(close, positions_path, instrument, instrument_id, logger)
+    if store_sim_positions:
+        store_sim_positions(close, sim_positions_path, instrument, instrument_id, logger)
         
     close['trade'] = close[['position']].diff()
     
@@ -68,6 +70,8 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     logger.info('Apply gearing factor = '+ str(gearing_factor) +' instrument_id='+ instrument_id)    
     close = apply_model_gearing(close, gearing_factor, instrument, point_value, capital)
     
+    close = apply_limits(close, instrument, point_value, slippage, capital, limits)
+    
     risk_free_rate = float(config.get('StrategySettings', 'risk_free_rate'))
     
     logger.info('Calculating sharpe ratio instrument_id='+ instrument_id)    
@@ -78,7 +82,6 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     drawdown = daily_drawdown(close['pnl'])
     #plot_drawdown(drawdown)
     
-    
     #plot_pnl(close,model)
     #plot_pnl_atr(close,model)
     date_range = pd.date_range(close.index.min(),close.index.max())
@@ -86,13 +89,12 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     close['close'] = close['close'].fillna(method='pad')
     close['position'] = close['position'].fillna(method='pad')
     close['notional'] = close['notional'].fillna(method='pad')
+    close['trade'] = close['trade'].fillna(method='pad')
     close['pnl'] = close['pnl'].fillna(method='pad')
      
-    close['model'] = model
-
-    model_run_result = collections.namedtuple('ModelRunResult', ['positions', 'notionals', 'pnl'])
+    model_run_result = collections.namedtuple('ModelRunResult', ['positions', 'notionals', 'trades', 'pnl'])
     
-    return model_run_result(positions = close[['model', 'position']], notionals = close[['model', 'notional']], pnl = close[['model', 'pnl']])
+    return model_run_result(positions = close[['model', 'close', 'instrument_id', 'position']], notionals = close[['model', 'instrument_id', 'notional']], trades = close[['model', 'close', 'instrument_id', 'trade']], pnl = close[['model', 'instrument_id', 'pnl']])
     
     
 def generate_signal(data, instrument_id):
