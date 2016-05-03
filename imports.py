@@ -23,3 +23,6 @@ import collections
 import pdb
 from scipy.stats import norm
 import matplotlib.mlab as mlab
+import schedule
+import smtplib
+from email.mime.text import MIMEText

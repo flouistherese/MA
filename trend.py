@@ -3,9 +3,9 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     pd.options.mode.chained_assignment = None  # default='warn'
 
 ####TEST CONFIG
-#    model = 'BTC_TREND_XEM'
-#    instrument_id = 'BTC_XEM'
-#    instrument = 'BTC_XEM'
+#    model = 'BTC_TREND_DASH'
+#    instrument_id = 'BTC_DASH'
+#    instrument = 'BTC_DASH'
 #    instrument_type = 'BTC_PAIR'
 #    point_value = 1
 #    config.read("config/engine.config")

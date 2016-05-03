@@ -94,6 +94,18 @@ class poloniex:
     # total         Total value of order (price * quantity)
     def returnOpenOrders(self,currencyPair):
         return self.api_query('returnOpenOrders',{"currencyPair":currencyPair})
+        
+    # Returns all trades involving a given order, specified by the "orderNumber" POST parameter.
+    # Inputs:
+    # orderNumber  The order number associated to the order
+    # Outputs: 
+    # orderNumber   The order number
+    # type          sell or buy
+    # rate          Price the order is selling or buying at
+    # Amount        Quantity of order
+    # total         Total value of order (price * quantity)
+    def returnOrderTrades(self,orderNumber):
+        return self.api_query('returnOrderTrades',{"orderNumber":orderNumber})
 
 
     # Returns your trade history for a given market, specified by the "currencyPair" POST parameter
@@ -105,8 +117,8 @@ class poloniex:
     # amount        Quantity of order
     # total         Total value of order (price * quantity)
     # type          sell or buy
-    def returnTradeHistory(self,currencyPair):
-        return self.api_query('returnTradeHistory',{"currencyPair":currencyPair})
+    def returnTradeHistory(self,currencyPair, start = 0, end = 9999999999):
+        return self.api_query('returnTradeHistory',{"currencyPair":currencyPair, 'start': start, 'end': end})
 
     # Places a buy order in a given market. Required POST parameters are "currencyPair", "rate", and "amount". If successful, the method will return the order number.
     # Inputs:

@@ -209,7 +209,8 @@ def generate_trades(current_positions_file, base_positions, base_capital, real_c
     positions_today = positions_today.merge(current_positions, how='left', on = 'model' )
     positions_today['trade'] = positions_today.target_position - positions_today.current_position
     if(long_only):
-        positions_today['trade'] = np.where(positions_today.trade < 0, 0, positions_today.trade)
+        #If model wants to go short, flatten the position
+        positions_today['trade'] = np.where(positions_today.trade + positions_today.current_position < 0 , -1 * positions_today.current_position , positions_today.trade)
     return(positions_today)
     
 def apply_limits(close, instrument, point_value, slippage, capital, limits):
@@ -223,22 +224,32 @@ def apply_limits(close, instrument, point_value, slippage, capital, limits):
     return(close)
     
 def execute_trades(trades):
-    trades_to_execute = trades[trades['trade'] > 0].reset_index()
-    for index in range(0, len(trades_to_execute)):
-        order_id = place_order(trades_to_execute['instrument_id'][index], trades_to_execute['price'][index], trades_to_execute['trade'][index])
-    #TODO: Keep track of order        
+    execution_recap = collections.namedtuple('ExecutionRecap', ['order_numbers', 'recaps'])
+    order_ids = []
+    recaps = []
+    trades_to_execute = trades[trades['trade'] != 0].reset_index()
     
+    for index in range(0, len(trades_to_execute)):
+        order_id, log_order = place_order(trades_to_execute['instrument_id'][index], trades_to_execute['price'][index], trades_to_execute['trade'][index])
+        order_ids.append(order_id)
+        recaps.append(log_order)    
+    
+    return(order_ids, recaps)
         
 def place_order(currency_pair, rate, amount):
     if(amount > 0):
         amount = round(amount,5)
-        orderId = p.buy(currency_pair,rate,amount)
-        logger.info('ORDER PLACED: ID= '+ str(orderId)+'  [BUY '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]')
+        #orderId = p.buy(currency_pair,rate,amount)
+        orderId = 123
+        log_msg = 'ORDER PLACED: ID= '+ str(orderId)+'  [BUY '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]'
+        logger.info(log_msg)
     else:
         amount = round(amount,5)
-        orderId = p.sell(currency_pair,rate,amount)
-        logger.info('ORDER PLACED: ID= '+ str(orderId)+'  [SELL '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]')
-    return(orderId)
+        #orderId = p.sell(currency_pair,rate,amount)
+        orderId = 456
+        log_msg = 'ORDER PLACED: ID= '+ str(orderId)+'  [SELL '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]'
+        logger.info(log_msg)
+    return(orderId, log_msg)
 
 def update_positions(current_positions_file):
     balances_raw = p.returnBalances()
@@ -248,6 +259,36 @@ def update_positions(current_positions_file):
     balances = balances.sort_values(by = 'currency')
     balances = balances[['model','currency','current_position']]
     balances.to_csv(current_positions_file, index = False)
-#'YAHOO/AAPL'
-#'CHRIS/CME_CL1'
-#plt.plot(data['Open'])
+    print"Positions file updated"
+    
+def send_recap_email(trades_today, exec_recaps, capital):
+    
+    recap = "Capital: "+ format(capital, '.10f') +" BTC \n\nModel Result:\n\n"
+    recap = recap + trades_today.to_string()
+    recap = recap + '\n\nExecution Recap:\n\n' + "\n".join(item for item in exec_recaps)
+    
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.ehlo()
+    server.starttls()
+    server.login(mail_user, gmail_pwd)
+    
+    msg = MIMEText(recap)
+    
+    msg['Subject'] = 'Trading Recap '+ time.strftime("%Y-%m-%d %H:%M:%S")
+    msg['From'] = mail_user
+    msg['To'] = ", ".join(mail_recipients)
+    
+    server.sendmail(mail_user, mail_recipients, msg.as_string())
+    server.quit()
+    
+def update_live_prices():
+    raw_ticker = p.returnTicker()
+    ticker = pd.DataFrame.from_dict(raw_ticker, orient = 'index').reset_index()
+    ticker_last = ticker[['index', 'last']]
+    ticker_last.columns = ['currency_pair', 'last']
+    
+    raw_trade_history = p.returnTradeHistory(currencyPair = 'all')
+    #TODO: Calculate Live PNL
+    return (ticker_last)
+    
+    
