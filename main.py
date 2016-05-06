@@ -38,9 +38,13 @@ mail_recipients = config.get('ConfigSettings','mail_recipients')
 
 p = poloniex(poloniex_api_key, poloniex_secret)
 
-schedule.every().day.at("16:30").do(run_model)
-schedule.every(10).seconds.do(update_positions, current_positions_file = current_positions_file)
+
+pnl_dict = create_pnl_dict(models)
+order_dict = create_order_dict(models)
+#schedule.every().day.at("16:30").do(run_model)
+#schedule.every(10).seconds.do(update_positions, current_positions_file = current_positions_file)
 schedule.every(10).seconds.do(update_live_pnl)
+
 #Main Loop
 while True:
     schedule.run_pending()

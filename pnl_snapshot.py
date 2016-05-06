@@ -1,5 +1,5 @@
 class PnlSnapshot:
-    def __init__(self, ticker, buy_or_sell, traded_price, traded_quantity):
+    def __init__(self, ticker):
         self.m_ticker = ticker
         self.m_net_position = 0
         self.m_avg_open_price = 0
@@ -7,7 +7,7 @@ class PnlSnapshot:
         self.m_realized_pnl = 0
         self.m_unrealized_pnl = 0
         self.m_total_pnl = 0
-        self.update_by_tradefeed(buy_or_sell, traded_price, traded_quantity)
+        self.m_latest_trade_id = 0
 
     # buy_or_sell: 1 is buy, -1 is sell
     def update_by_tradefeed(self, buy_or_sell, traded_price, traded_quantity):

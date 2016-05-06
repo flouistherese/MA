@@ -62,16 +62,13 @@ def calculate_pnl(close, instrument, point_value, slippage):
     pnl = np.array([])
     first_position = close[close['position'] != 0].index[0]
     positions = close[first_position:][ - np.isnan(close['vol'])]
-    pnl_snapshot = PnlSnapshot(instrument, np.sign(positions.ix[0].trade), positions.ix[0].close, abs(positions.ix[0].trade * point_value))
-    row_number = 0
+    pnl_snapshot = PnlSnapshot(instrument)
     for index, row in positions.iterrows():
-        if row_number > 0:
-            fill_price = row['close'] + np.sign(row['trade']) * row['close'] * slippage
-            if abs(row['trade'] ) > 0:
-                pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), fill_price , abs(row['trade'] * point_value))
-            pnl_snapshot.update_by_marketdata(row['close'])
-            pnl = np.append(pnl, pnl_snapshot.m_total_pnl - row['transaction_cost'])
-        row_number += 1
+        fill_price = row['close'] + np.sign(row['trade']) * row['close'] * slippage
+        if abs(row['trade'] ) > 0:
+            pnl_snapshot.update_by_tradefeed(np.sign(row['trade']), fill_price , abs(row['trade'] * point_value))
+        pnl_snapshot.update_by_marketdata(row['close'])
+        pnl = np.append(pnl, pnl_snapshot.m_total_pnl - row['transaction_cost'])
     return pnl
     
 def annualised_sharpe(returns, risk_free_rate = 0.02, N=252):
@@ -203,7 +200,8 @@ def historical_atr_gaussian_fitting(data, ATR, display = False):
 
 def generate_trades(current_positions_file, base_positions, base_capital, real_capital):
     current_positions = pd.DataFrame.from_csv(current_positions_file,index_col = None)
-    positions_today = base_positions[time.strftime("%m/%d/%Y")]
+    #positions_today = base_positions[time.strftime("%m/%d/%Y")]
+    positions_today = base_positions["05/05/2016"]
     positions_today.columns = ['model', 'price', 'instrument_id', 'target_position']
     positions_today['target_position'] = positions_today.target_position * real_capital/float(base_capital)
     positions_today = positions_today.merge(current_positions, how='left', on = 'model' )
@@ -232,6 +230,7 @@ def execute_trades(trades):
     for index in range(0, len(trades_to_execute)):
         order_id, log_order = place_order(trades_to_execute['instrument_id'][index], trades_to_execute['price'][index], trades_to_execute['trade'][index])
         order_ids.append(order_id)
+        order_dict[trades_to_execute['model'][index]].append(order_id)
         recaps.append(log_order)    
     
     return(order_ids, recaps)
@@ -239,17 +238,15 @@ def execute_trades(trades):
 def place_order(currency_pair, rate, amount):
     if(amount > 0):
         amount = round(amount,5)
-        #orderId = p.buy(currency_pair,rate,amount)
-        orderId = 123
-        log_msg = 'ORDER PLACED: ID= '+ str(orderId)+'  [BUY '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]'
+        orderId = p.buy(currency_pair,rate,amount)
+        log_msg = 'ORDER PLACED: ID= '+ str(int(orderId['orderNumber']))+'  [BUY '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]'
         logger.info(log_msg)
     else:
         amount = round(amount,5)
-        #orderId = p.sell(currency_pair,rate,amount)
-        orderId = 456
-        log_msg = 'ORDER PLACED: ID= '+ str(orderId)+'  [SELL '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]'
+        orderId = p.sell(currency_pair,rate,amount)
+        log_msg = 'ORDER PLACED: ID= '+ str(int(orderId['orderNumber']))+'  [SELL '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]'
         logger.info(log_msg)
-    return(orderId, log_msg)
+    return(int(orderId['orderNumber']), log_msg)
 
 def update_positions(current_positions_file):
     balances_raw = p.returnBalances()
@@ -285,10 +282,53 @@ def update_live_prices():
     raw_ticker = p.returnTicker()
     ticker = pd.DataFrame.from_dict(raw_ticker, orient = 'index').reset_index()
     ticker_last = ticker[['index', 'last']]
-    ticker_last.columns = ['currency_pair', 'last']
+    ticker_last.columns = ['id', 'last']
     
-    raw_trade_history = p.returnTradeHistory(currencyPair = 'all')
-    #TODO: Calculate Live PNL
+    models_price = models.merge(ticker_last, how = 'left', on = 'id')
+    for index, row in models_price.iterrows():
+        pnl_dict[row['model']].update_by_marketdata(float(row['last']))
+        print row['model'] + "Updated with price "+row['last']
+    print "\n\n\n\n"
     return (ticker_last)
+    
+def create_pnl_dict(models):
+    pnl_dict = {}
+    for index, row in models.iterrows():
+        pnl_dict[row['model']] = PnlSnapshot(row['instrument'])
+    return(pnl_dict)
+    
+def create_order_dict(models):
+    order_dict = {}
+    for index, row in models.iterrows():
+        order_dict[row['model']] = list()
+    return(order_dict)
+
+def update_trades():
+    trade_history = p.returnTradeHistory(currencyPair = 'all')
+    for index, row in models.iterrows():
+        model_order_ids = order_dict[row['model']]
+        if row['id'] in trade_history:
+            trades_exchange = pd.DataFrame.from_dict(trade_history[row['id']]).reset_index()
+            trades_exchange['orderNumber'] = pd.to_numeric(trades_exchange['orderNumber'])
+            trades_exchange['globalTradeID'] = pd.to_numeric(trades_exchange['globalTradeID'])
+            print "Trades exchange " + trades_exchange.to_string()
+            model_trades_exchange = trades_exchange.loc[trades_exchange['orderNumber'].isin(model_order_ids)]
+            latest_trade_id = pnl_dict[row['model']].m_latest_trade_id
+            trades_to_add = model_trades_exchange[model_trades_exchange['globalTradeID'] > latest_trade_id].sort_values('globalTradeID')
+            print "Trades to add" + trades_to_add.to_string()
+            for index_trade, row_trade in trades_to_add.iterrows():
+                direction = 0
+                if(row_trade['type'] == 'buy'):
+                    direction = 1
+                elif(row_trade['type'] == 'sell'):   
+                     direction = -1
+                pnl_dict[row['model']].update_by_tradefeed(direction, float(row_trade['rate']), float(row_trade['amount']))
+                pnl_dict[row['model']].m_latest_trade_id = row_trade['globalTradeID']
+                print row['model']+" PnL updated with "+row_trade['type']+" "+row_trade['amount']+" @ "+ row_trade['rate']
+
+def update_live_pnl():
+    update_trades()
+    update_live_prices()
+        
     
     
