@@ -1,8 +1,8 @@
 TODO:
 - Send email when trade filled
 DONE Allow selling of one currency if algo already holds some of it. If model wants to go from Long to Short, flatten the position.
-- Continuously update positions.csv (separate thread?)
-- Create and continuously update PnL spreadsheet (separate thread?)
+DONE Continuously update positions.csv (separate thread?)
+DONE Create and continuously update PnL spreadsheet (separate thread?)
 - Create a Trade History spreadsheet
 - Allow the algo to run without downloading all the historical data each time
 - Apply gearing at the portfolio level

@@ -8,6 +8,8 @@ class PnlSnapshot:
         self.m_unrealized_pnl = 0
         self.m_total_pnl = 0
         self.m_latest_trade_id = 0
+        self.m_number_trades = 0
+        self.m_last_price = 0
 
     # buy_or_sell: 1 is buy, -1 is sell
     def update_by_tradefeed(self, buy_or_sell, traded_price, traded_quantity):
@@ -32,9 +34,15 @@ class PnlSnapshot:
                 self.m_unrealized_pnl = 0
         # net position
         self.m_net_position += quantity_with_direction
+        self.m_number_trades = self.m_number_trades + 1
         
         self.m_total_pnl = self.m_realized_pnl + self.m_unrealized_pnl
 
     def update_by_marketdata(self, last_price):
         self.m_unrealized_pnl = ( last_price - self.m_avg_open_price ) * self.m_net_position
         self.m_total_pnl = self.m_realized_pnl + self.m_unrealized_pnl
+        self.m_last_price = last_price
+        
+        
+    def to_string(self):
+       return "["+self.m_ticker +"]\nNet Position: "+ format(self.m_net_position, '.10f')+"\nAverage Open Price: "+format(self.m_avg_open_price, '.10f')+"\nNumber of Trades: "+str(self.m_number_trades)+"\nLast Price: "+format(self.m_last_price, '.10f')+"\nRealized PnL: "+format(self.m_realized_pnl, '.10f')+"\nUnrealized PnL: "+format(self.m_unrealized_pnl, '.10f')+"\nTotal PnL: "+format(self.m_total_pnl, '.10f')+"\n\n"

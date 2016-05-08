@@ -72,14 +72,14 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     
     close = apply_limits(close, instrument, point_value, slippage, capital, limits)
     
-    risk_free_rate = float(config.get('StrategySettings', 'risk_free_rate'))
+    #risk_free_rate = float(config.get('StrategySettings', 'risk_free_rate'))
     
-    logger.info('Calculating sharpe ratio instrument_id='+ instrument_id)    
-    sharpe_ratio = annualised_sharpe(close['daily_pnl_pct'], risk_free_rate = risk_free_rate)
-    logger.info('Sharpe ratio = ' + str(sharpe_ratio) + ' instrument_id='+ instrument_id)    
+    #logger.info('Calculating sharpe ratio instrument_id='+ instrument_id)    
+    #sharpe_ratio = annualised_sharpe(close['daily_pnl_pct'], risk_free_rate = risk_free_rate)
+    #logger.info('Sharpe ratio = ' + str(sharpe_ratio) + ' instrument_id='+ instrument_id)    
     
-    logger.info('Calculating daily drawdown instrument_id='+ instrument_id)    
-    drawdown = daily_drawdown(close['pnl'])
+    #logger.info('Calculating daily drawdown instrument_id='+ instrument_id)    
+    #drawdown = daily_drawdown(close['pnl'])
     #plot_drawdown(drawdown)
     
     #plot_pnl(close,model)

@@ -21,6 +21,7 @@ transaction_cost = float(config.get('AccountSettings', 'transaction_cost'))
 store_sim_positions = config.getboolean('StrategySettings','store_sim_positions')
 long_only = config.getboolean('StrategySettings','long_only')
 sim_positions_path = config.get('StrategySettings','sim_positions_path')
+order_file_path = config.get('StrategySettings','order_file_path')
 current_positions_file = config.get('StrategySettings','positions_path')
 signals_path = config.get('StrategySettings','signals_path')
 limits = pd.read_csv(config.get('StrategySettings','limits_path'), sep=',')
@@ -40,9 +41,9 @@ p = poloniex(poloniex_api_key, poloniex_secret)
 
 
 pnl_dict = create_pnl_dict(models)
-order_dict = create_order_dict(models)
+order_dict = create_order_dict(models, order_file_path)
+update_live_pnl()
 #schedule.every().day.at("16:30").do(run_model)
-#schedule.every(10).seconds.do(update_positions, current_positions_file = current_positions_file)
 schedule.every(10).seconds.do(update_live_pnl)
 
 #Main Loop
@@ -71,6 +72,6 @@ def run_model():
     if trading_enabled:
         order_ids, exec_recaps = execute_trades(trades_today)
     
-    send_recap_email(trades_today, exec_recaps, btc_capital)
+    send_recap_email(trades_today, exec_recaps, btc_capital, pnl_dict)
     
     
