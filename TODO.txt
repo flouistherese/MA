@@ -1,5 +1,6 @@
 TODO:
 - Send email when trade filled
+- Write trend params (ATR coeff, gearing factor...) so that you dont have to calculate it all over everytime you run model live
 DONE Allow selling of one currency if algo already holds some of it. If model wants to go from Long to Short, flatten the position.
 DONE Continuously update positions.csv (separate thread?)
 DONE Create and continuously update PnL spreadsheet (separate thread?)
