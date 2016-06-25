@@ -46,3 +46,9 @@ class PnlSnapshot:
         
     def to_string(self):
        return "["+self.m_ticker +"]\nNet Position: "+ format(self.m_net_position, '.10f')+"\nAverage Open Price: "+format(self.m_avg_open_price, '.10f')+"\nNumber of Trades: "+str(self.m_number_trades)+"\nLast Price: "+format(self.m_last_price, '.10f')+"\nRealized PnL: "+format(self.m_realized_pnl, '.10f')+"\nUnrealized PnL: "+format(self.m_unrealized_pnl, '.10f')+"\nTotal PnL: "+format(self.m_total_pnl, '.10f')+"\n\n"
+       
+    def to_data_frame(self):
+        d = {'model': [self.m_ticker], 'position': [self.m_net_position], 'avg_open_price': [format(self.m_avg_open_price, '.10f')], 'last_price': [format(self.m_last_price, '.10f')], 'unrealized_pnl': [self.m_unrealized_pnl], 'realized_pnl': [self.m_realized_pnl], 'total_pnl': [self.m_total_pnl]}
+        df = pd.DataFrame(data = d)
+        df = df[['model', 'position', 'avg_open_price', 'last_price', 'unrealized_pnl', 'realized_pnl', 'total_pnl']]
+        return(df)

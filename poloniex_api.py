@@ -92,7 +92,7 @@ class poloniex:
     # rate          Price the order is selling or buying at
     # Amount        Quantity of order
     # total         Total value of order (price * quantity)
-    def returnOpenOrders(self,currencyPair):
+    def returnOpenOrders(self,currencyPair = 'all'):
         return self.api_query('returnOpenOrders',{"currencyPair":currencyPair})
         
     # Returns all trades involving a given order, specified by the "orderNumber" POST parameter.

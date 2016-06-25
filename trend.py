@@ -1,11 +1,39 @@
-def calculate_positions(model, instrument_id, instrument, instrument_type, point_value, logger, config):
+def calculate_positions(model, instrument_id, instrument, capital_allocated, logger, config):
+    pd.options.mode.chained_assignment = None  # default='warn'
+    
+###TEST CONFIG
+#    model = 'BTC_TREND_LTC'
+#    instrument_id = 'BTC_LTC'
+#    instrument = 'BTC_LTC'
+#    instrument_type = 'BTC_PAIR'
+#    point_value = 1
+    config.read("config/engine.config")
+#    capital_allocated = 10
+####
+    logger.info('Downloading data for instrument_id='+ instrument_id)
+    data = getHistoricalData(instrument_id)
 
+    close = data[['Last']]*base_multiplier
+    close.columns = ['close']
+    close['model'] = model
+    close['instrument_id'] = instrument_id
+    
+    close = generate_signal(close, instrument_id)
+    position_today = close.tail(1)
+    position_today.loc[:,('position')] = close.tail(1).apply(lambda row: trade_size(row['signal'], capital_allocated, row['close']), axis=1)
+    
+    return (position_today[['model', 'close', 'instrument_id', 'position']])
+
+
+
+def backtest(model, instrument_id, instrument, instrument_type, point_value, logger, config):
+    
     pd.options.mode.chained_assignment = None  # default='warn'
 
-####TEST CONFIG
-#    model = 'BTC_TREND_DASH'
-#    instrument_id = 'BTC_DASH'
-#    instrument = 'BTC_DASH'
+###TEST CONFIG
+#    model = 'BTC_TREND_LTC'
+#    instrument_id = 'BTC_LTC'
+#    instrument = 'BTC_LTC'
 #    instrument_type = 'BTC_PAIR'
 #    point_value = 1
 #    config.read("config/engine.config")
@@ -63,16 +91,16 @@ def calculate_positions(model, instrument_id, instrument, instrument_type, point
     close = update_pnl(close, instrument, point_value, slippage, capital)
     
     #plot_pnl(close,instrument)
+    if geared:
+        logger.info('Calculating gearing factor with vol target = '+ str(vol_target) +' instrument_id='+ instrument_id)    
+        gearing_factor = calculate_model_gearing(close['pnl'], capital = capital, vol_target = vol_target )
+        
+        logger.info('Apply gearing factor = '+ str(gearing_factor) +' instrument_id='+ instrument_id)    
+        close = apply_model_gearing(close, gearing_factor, instrument, point_value, capital)
     
-    logger.info('Calculating gearing factor with vol target = '+ str(vol_target) +' instrument_id='+ instrument_id)    
-    gearing_factor = calculate_model_gearing(close['pnl'], capital = capital, vol_target = vol_target )
+    #close = apply_limits(close, instrument, point_value, slippage, capital, limits)
     
-    logger.info('Apply gearing factor = '+ str(gearing_factor) +' instrument_id='+ instrument_id)    
-    close = apply_model_gearing(close, gearing_factor, instrument, point_value, capital)
-    
-    close = apply_limits(close, instrument, point_value, slippage, capital, limits)
-    
-    #risk_free_rate = float(config.get('StrategySettings', 'risk_free_rate'))
+   # risk_free_rate = float(config.get('StrategySettings', 'risk_free_rate'))
     
     #logger.info('Calculating sharpe ratio instrument_id='+ instrument_id)    
     #sharpe_ratio = annualised_sharpe(close['daily_pnl_pct'], risk_free_rate = risk_free_rate)
@@ -109,11 +137,9 @@ def generate_signal(data, instrument_id):
     
     logger.info('Calculating historical signals instrument_id='+instrument_id)
     data['signal'] = data['ma1'] - data['ma2']
-    if use_atr:
-        #How many std dev away from the mean
-        data['atr_coefficient'] = np.ceil(abs(data.ATR - data.ATR_mean)/data.ATR_std)
-        data.ix[abs(data.signal)< (data.ATR * data['atr_coefficient']), 'signal'] = 0
+
     data['signal'][np.isnan(data['signal'])] = 0
     data['signal'] = np.sign(data['signal'])
     
     return data
+    
