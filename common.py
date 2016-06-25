@@ -239,10 +239,10 @@ def update_trades():
                 rate_after_fee = round(row_trade['rate'])
                 if(row_trade['type'] == 'buy'):
                     direction = 1
-                    amount_after_fee = round(amount_after_fee * (1.0 - float(row_trade['fee'])))
+                    amount_after_fee = math.ceil(amount_after_fee * (1.0 - float(row_trade['fee'])))
                 elif(row_trade['type'] == 'sell'):   
                     direction = -1
-                    rate_after_fee = round(rate_after_fee * (1.0 - float(row_trade['fee'])))
+                    rate_after_fee = math.ceil(rate_after_fee * (1.0 - float(row_trade['fee'])))
                 pnl_dict[row['model']].update_by_tradefeed(direction, rate_after_fee, amount_after_fee) #Add each of those trades to PnL
                 pnl_dict[row['model']].m_latest_trade_id = row_trade['globalTradeID'] #Update last trade id
                 print row['model']+" PnL updated with "+row_trade['type']+" "+format(amount_after_fee, '.20f')+" @ "+ str(rate_after_fee)
