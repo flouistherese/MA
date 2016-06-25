@@ -279,7 +279,7 @@ def get_capital(capital_path):
     btc_cash = float(balances_raw['BTC']) * base_multiplier 
     btc_assets = 0
     for key in pnl_dict:    
-        btc_assets = btc_assets + (pnl_dict[key].m_net_position * pnl_dict[key].m_avg_open_price)
+        btc_assets = btc_assets + (pnl_dict[key].m_net_position * pnl_dict[key].m_avg_open_price / base_multiplier)
     btc_capital = btc_cash + btc_assets
 #    capitals = pd.DataFrame.from_csv(capital_path)
     return (btc_capital)
