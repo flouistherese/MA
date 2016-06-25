@@ -5,6 +5,7 @@ execfile('keys.py')
 execfile('imports.py')
 execfile('poloniex_api.py')
 execfile('common.py')
+execfile('backtest.py')
 execfile('trend.py')
 execfile('pnl_snapshot.py')
 %matplotlib qt
@@ -40,14 +41,14 @@ number_atr = int(config.get('StrategySettings','number_atr'))
 mail_user = config.get('ConfigSettings','mail_user')
 mail_recipients = config.get('ConfigSettings','mail_recipients')
 
-base_multiplier = 1E8
-p = poloniex(poloniex_api_key, poloniex_secret)
+base_multiplier = 1E8 #Multiplier used for every price in order to avoid floating point issue
+p = poloniex(poloniex_api_key, poloniex_secret) #Connection to Poloniex API
 
 
-pnl_dict = create_pnl_dict(models)
+pnl_dict = create_pnl_dict(models) # pnl_dict['BTC_TREND_SC'] return matching PnlSnapshot object
 order_dict = create_order_dict(models, order_file_path)
 update_live_pnl()
-schedule.every(30).seconds.do(update_live_pnl)
+#schedule.every(30).seconds.do(update_live_pnl)
 
 #Main Loop
 while True:
@@ -57,7 +58,7 @@ while True:
     
 def run_model():
     btc_capital = get_capital(capital_path) 
-    capital_allocated = btc_capital / len(models)
+    capital_allocated = btc_capital / len(models) #Capital equally allocated to each model
     for index, row in models.iterrows():
         logger.info('Processing '+ row['model'] +' '+row['instrument_type']+' '+ row['instrument']+' id='+row['id'])
         position_today = calculate_positions(row['model'], row['id'], row['instrument'], capital_allocated, logger, config)

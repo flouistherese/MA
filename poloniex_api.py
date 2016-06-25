@@ -29,16 +29,24 @@ class poloniex:
 
         if(command == "returnTicker" or command == "return24Volume"):
             ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + command))
-            return json.loads(ret.read())
+            value = json.loads(ret.read())
+            ret.close()
+            return value
         elif(command == "returnOrderBook"):
             ret = urllib2.urlopen(urllib2.Request('http://poloniex.com/public?command=' + command + '&currencyPair=' + str(req['currencyPair'])))
-            return json.loads(ret.read())
+            value = json.loads(ret.read())
+            ret.close()
+            return value
         elif(command == "returnMarketTradeHistory"):
             ret = urllib2.urlopen(urllib2.Request('http://poloniex.com/public?command=' + "returnTradeHistory" + '&currencyPair=' + str(req['currencyPair'])))
-            return json.loads(ret.read())
+            value = json.loads(ret.read())
+            ret.close()
+            return value
         elif(command == "returnChartData"):
             ret = urllib2.urlopen(urllib2.Request('http://poloniex.com/public?command=' + "returnChartData" + '&currencyPair=' + str(req['currencyPair']) + '&start=' + str(req['start'])+ '&end=' + str(req['end'])+ '&period=' + str(req['period'])))
-            return json.loads(ret.read())
+            value = json.loads(ret.read())
+            ret.close()
+            return value
         else:
             req['command'] = command
             req['nonce'] = int(time.time()*1000)
@@ -52,6 +60,7 @@ class poloniex:
 
             ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
             jsonRet = json.loads(ret.read())
+            ret.close()
             return self.post_process(jsonRet)
 
 
