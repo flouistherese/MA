@@ -279,6 +279,7 @@ def get_capital(capital_path):
     btc_cash = float(balances_raw['BTC']) * base_multiplier 
     btc_assets = 0
     for key in pnl_dict:    
+        print key + " "+str(pnl_dict[key].m_net_position)+" @ "+str(pnl_dict[key].m_avg_open_price)
         btc_assets = btc_assets + (pnl_dict[key].m_net_position * pnl_dict[key].m_avg_open_price / base_multiplier)
     btc_capital = btc_cash + btc_assets
 #    capitals = pd.DataFrame.from_csv(capital_path)
@@ -309,9 +310,9 @@ def close_all_positions():
         if row['current_position'] > 0.0001:
             currencyPair = models.loc[models.model == row['model']].reset_index()['instrument'][0]
             if row['current_position'] > 0:
-                price = float(ticker.loc[str(currencyPair)]['highestBid'])
-            else:
                 price = float(ticker.loc[str(currencyPair)]['lowestAsk'])
+            else:
+                price = float(ticker.loc[str(currencyPair)]['highestBid'])
             amount = round(row['current_position'] * 1/base_multiplier,8)
             print row['model'] + "cur = "+str(row['current_position'])+" price = "+str(price)+" pos = "+ str(amount)
             order_id, log_order = place_order(row['model'], currencyPair, price, -1 * amount)
