@@ -2,13 +2,13 @@ def calculate_positions(model, instrument_id, instrument, capital_allocated, log
     pd.options.mode.chained_assignment = None  # default='warn'
     
 ###TEST CONFIG
-#    model = 'BTC_TREND_LTC'
-#    instrument_id = 'BTC_LTC'
-#    instrument = 'BTC_LTC'
-#    instrument_type = 'BTC_PAIR'
-#    point_value = 1
-    config.read("config/engine.config")
-#    capital_allocated = 10
+##    model = 'BTC_TREND_LTC'
+##    instrument_id = 'BTC_LTC'
+##    instrument = 'BTC_LTC'
+##    instrument_type = 'BTC_PAIR'
+##    point_value = 1
+#    config.read("config/engine.config")
+##    capital_allocated = 10
 ####
     logger.info('Downloading data for instrument_id='+ instrument_id)
     data = getHistoricalData(instrument_id)

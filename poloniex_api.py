@@ -33,17 +33,17 @@ class poloniex:
             ret.close()
             return value
         elif(command == "returnOrderBook"):
-            ret = urllib2.urlopen(urllib2.Request('http://poloniex.com/public?command=' + command + '&currencyPair=' + str(req['currencyPair'])))
+            ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + command + '&currencyPair=' + str(req['currencyPair'])))
             value = json.loads(ret.read())
             ret.close()
             return value
         elif(command == "returnMarketTradeHistory"):
-            ret = urllib2.urlopen(urllib2.Request('http://poloniex.com/public?command=' + "returnTradeHistory" + '&currencyPair=' + str(req['currencyPair'])))
+            ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + "returnTradeHistory" + '&currencyPair=' + str(req['currencyPair'])))
             value = json.loads(ret.read())
             ret.close()
             return value
         elif(command == "returnChartData"):
-            ret = urllib2.urlopen(urllib2.Request('http://poloniex.com/public?command=' + "returnChartData" + '&currencyPair=' + str(req['currencyPair']) + '&start=' + str(req['start'])+ '&end=' + str(req['end'])+ '&period=' + str(req['period'])))
+            ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + "returnChartData" + '&currencyPair=' + str(req['currencyPair']) + '&start=' + str(req['start'])+ '&end=' + str(req['end'])+ '&period=' + str(req['period'])))
             value = json.loads(ret.read())
             ret.close()
             return value
@@ -76,7 +76,7 @@ class poloniex:
     def returnMarketTradeHistory (self, currencyPair):
         return self.api_query("returnMarketTradeHistory", {'currencyPair': currencyPair})
         
-    def returnChartData(self, currencyPair, start = 0, end = 9999999999, period = 86400):
+    def returnChartData(self, currencyPair, start = 0, end = 9999999999, period = 14400):
         data = self.api_query("returnChartData", {'currencyPair': currencyPair, 'start': start, 'end': end, 'period': period})
         df_data = pd.DataFrame.from_dict(data)
         df_data['date'] = pd.to_datetime(df_data['date'], unit = 's')

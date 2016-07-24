@@ -1,7 +1,7 @@
 api_key = "JyPzgcScbDfyY5H-mVhM"
 
 def createLogger(logfile_path):
-    logger = logging.getLogger('myapp')
+    logger = logging.getLogger('')
     hdlr = logging.FileHandler(logfile_path)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
     hdlr.setFormatter(formatter)
@@ -107,6 +107,7 @@ def generate_trades(current_positions_file, position_today):
     position_today.columns = ['model', 'price', 'instrument_id', 'target_position']
     position_today = position_today.merge(current_positions, how='left', on = 'model' )
     position_today['trade'] = position_today.target_position - position_today.current_position
+    position_today['trade'] = np.where(abs((position_today.trade * position_today.price) / base_multiplier) < minimum_btc_trade , 0 , position_today.trade)
     if(long_only):
         position_today['trade'] = np.where(position_today.trade + position_today.current_position < 0 , -1 * position_today.current_position , position_today.trade)
     return(position_today)
@@ -138,21 +139,26 @@ def execute_trades(trades):
     return(order_ids, recaps)
         
 def place_order(model, currency_pair, rate, amount):
+    side = ''
+    log_msg = ''
+    orderNumber = -1
     if(amount > 0):
         amount = round(amount,8)
         orderResult = p.buy(currency_pair,rate,amount)
-        logger.info(orderResult)
-        log_msg = 'ORDER PLACED: ID= '+ str(int(orderResult['orderNumber']))+'  [BUY '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]'
-        logger.info(log_msg)
+        side = 'BUY'
     else:
         amount = round(amount,8)
         orderResult = p.sell(currency_pair,rate,abs(amount))
-        logger.info(orderResult)
-        log_msg = 'ORDER PLACED: ID= '+ str(int(orderResult['orderNumber']))+'  [SELL '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]'
-        logger.info(log_msg)
-    print "Received: "+pd.DataFrame.from_dict(orderResult).to_string()
-    add_to_order_file(model, int(orderResult['orderNumber']), currency_pair, rate, amount)
-    return(int(orderResult['orderNumber']), log_msg)
+        side = 'SELL'
+        
+    if('error' in orderResult):
+        log_msg = "ORDER ERROR ["+model+" "+format(amount, '.10f')+" @ "+format(rate, '.10f')+"]: "+orderResult['error']+"\n"
+    else:
+        log_msg = 'ORDER PLACED: ID= '+ str(int(orderResult['orderNumber']))+'  ['+side+' '+currency_pair+' '+format(amount, '.10f')+' @ '+format(rate, '.10f')+' ]'
+        add_to_order_file(model, int(orderResult['orderNumber']), currency_pair, rate, amount)
+        orderNumber = int(orderResult['orderNumber'])
+    logger.info(log_msg)
+    return(orderNumber, log_msg)
 
 def update_positions():
     balances_raw = p.returnBalances()
@@ -209,6 +215,11 @@ def create_pnl_dict(models):
     
 def create_order_dict(models, order_file_path):
     order_dict = {}
+    if(os.stat(order_file_path).st_size == 0):
+        for index, row in models.iterrows():
+            order_dict[row['model']] = []
+        return(order_dict)
+        
     previous_orders = pd.DataFrame.from_csv(order_file_path)
     for index, row in models.iterrows():
         previous_model_orders = previous_orders[previous_orders['model'] == row['model']]
@@ -263,11 +274,14 @@ def update_live_pnl():
     
     
 def add_to_order_file(model, order_number, currency_pair, rate, amount):
-    orders = pd.DataFrame.from_csv(order_file_path,index_col = None)
     new_order = pd.DataFrame(np.array([[time.strftime("%Y-%m-%d %H:%M:%S"), model, str(order_number), currency_pair, format(rate, '.10f'), format(amount, '.10f')]]), columns=['time', 'model', 'order_number', 'instrument_id', 'price', 'amount'])
-    orders = orders.append(new_order)
-    orders.to_csv(order_file_path, index = False)
-
+    if(os.stat(order_file_path).st_size != 0):
+        orders = pd.DataFrame.from_csv(order_file_path,index_col = None)
+        orders = orders.append(new_order)
+        orders.to_csv(order_file_path, index = False)
+    else:
+        new_order.to_csv(order_file_path, index = False)
+    
 def remove_from_order_file(order_number):
     orders = pd.DataFrame.from_csv(order_file_path,index_col = None)
     orders = orders[orders.order_number != order_number]
@@ -278,8 +292,7 @@ def get_capital(capital_path):
     balances_raw = p.returnBalances()
     btc_cash = float(balances_raw['BTC']) * base_multiplier 
     btc_assets = 0
-    for key in pnl_dict:    
-        print key + " "+str(pnl_dict[key].m_net_position)+" @ "+str(pnl_dict[key].m_avg_open_price)
+    for key in pnl_dict:
         btc_assets = btc_assets + (pnl_dict[key].m_net_position * pnl_dict[key].m_avg_open_price / base_multiplier)
     btc_capital = btc_cash + btc_assets
 #    capitals = pd.DataFrame.from_csv(capital_path)
@@ -306,15 +319,13 @@ def close_all_positions():
     raw_ticker = p.returnTicker()
     ticker = pd.DataFrame.from_dict(raw_ticker, orient = 'index')
     for index, row in current_positions.iterrows():
-        
         if row['current_position'] > 0.0001:
             currencyPair = models.loc[models.model == row['model']].reset_index()['instrument'][0]
             if row['current_position'] > 0:
-                price = float(ticker.loc[str(currencyPair)]['lowestAsk'])
-            else:
                 price = float(ticker.loc[str(currencyPair)]['highestBid'])
+            else:
+                price = float(ticker.loc[str(currencyPair)]['lowestAsk'])
             amount = round(row['current_position'] * 1/base_multiplier,8)
-            print row['model'] + "cur = "+str(row['current_position'])+" price = "+str(price)+" pos = "+ str(amount)
             order_id, log_order = place_order(row['model'], currencyPair, price, -1 * amount)
             order_dict[row['model']].append(order_id)
     
