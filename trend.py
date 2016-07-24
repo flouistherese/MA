@@ -10,7 +10,7 @@ def calculate_positions(model, instrument_id, instrument, capital_allocated, log
 #    config.read("config/engine.config")
 ##    capital_allocated = 10
 ####
-    logger.info('Downloading data for instrument_id='+ instrument_id)
+    logger.debug('Downloading data for instrument_id='+ instrument_id)
     data = getHistoricalData(instrument_id)
 
     close = data[['Last']]*base_multiplier

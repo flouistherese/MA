@@ -167,14 +167,14 @@ def backtest(model, instrument_id, instrument, instrument_type, point_value, log
 def generate_signal(data, instrument_id):
     ma1 = int(config.get('StrategySettings','ma1'))
     ma2 = int(config.get('StrategySettings','ma2'))
-    logger.info('Calculating '+str(ma1)+'-day moving average instrument_id='+ instrument_id)
+    logger.debug('Calculating '+str(ma1)+'-day moving average instrument_id='+ instrument_id)
     ma1 = movingaverage(data['close'] , ma1)
-    logger.info('Calculating '+str(ma2)+'-day moving average instrument_id='+ instrument_id)
+    logger.debug('Calculating '+str(ma2)+'-day moving average instrument_id='+ instrument_id)
     ma2 = movingaverage(data['close'] , ma2)
     data['ma1'] = pad(ma1, len(data) - ma1.size, float('nan'))
     data['ma2'] = pad(ma2, len(data) - ma2.size, float('nan'))
     
-    logger.info('Calculating historical signals instrument_id='+instrument_id)
+    logger.debug('Calculating historical signals instrument_id='+instrument_id)
     data['signal'] = data['ma1'] - data['ma2']
 
     data['signal'][np.isnan(data['signal'])] = 0
