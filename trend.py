@@ -11,7 +11,8 @@ def calculate_positions(model, instrument_id, instrument, capital_allocated, log
 ##    capital_allocated = 10
 ####
     logger.debug('Downloading data for instrument_id='+ instrument_id)
-    data = getHistoricalData(instrument_id)
+    #Period in seconds 300, 900, 1800, 7200, 14400, and 86400 available
+    data = getHistoricalData(instrument_id, period = 1800)
 
     close = data[['Last']]*base_multiplier
     close.columns = ['close']

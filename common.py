@@ -3,14 +3,14 @@ api_key = "JyPzgcScbDfyY5H-mVhM"
 def createLogger(logfile_path):
     logger = logging.getLogger('')
     hdlr = logging.FileHandler(logfile_path)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    hdlr.setFormatter(formatter)
+    #formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    #hdlr.setFormatter(formatter)
     logger.addHandler(hdlr) 
     logger.setLevel(logging.INFO)
     return logger
     
-def getHistoricalData(ticker):  
-    data = p.returnChartData(currencyPair = ticker, start = int(time.time()) - 3600 * 24 *365)
+def getHistoricalData(ticker, period = 14400):  
+    data = p.returnChartData(currencyPair = ticker, start = int(time.time()) - 3600 * 24 *4, period = period)
     data.columns = ['Last', 'High', 'Low','Open','quoteVolume', 'volume', 'weightedAverage']
     return data
     
@@ -170,7 +170,7 @@ def update_positions():
     balances = balances[balances['model'].isin(models['model'])]
     balances['current_position'] = balances['current_position'].values.astype(np.float) * base_multiplier
     balances.to_csv(current_positions_file, index = False)
-    print "Positions file updated"
+    logger.info("Positions file updated")
     
 def send_recap_email(trades_today, exec_recaps, capital, pnl_dict):
     
@@ -243,7 +243,7 @@ def update_trades():
             trades_to_add['amount'] = trades_to_add['amount'].values.astype(np.float) * base_multiplier
             trades_to_add['rate'] = trades_to_add['rate'].values.astype(np.float) * base_multiplier
             if len(trades_to_add) > 0:
-                print "Trades to add: \n" + trades_to_add.to_string()+"\n\n"
+                logger.info("Trades to add: \n" + trades_to_add.to_string()+"\n\n")
             for index_trade, row_trade in trades_to_add.iterrows():
                 direction = 0
                 amount_after_fee = round(row_trade['amount'])
@@ -256,8 +256,8 @@ def update_trades():
                     rate_after_fee = math.ceil(rate_after_fee * (1.0 - float(row_trade['fee'])))
                 pnl_dict[row['model']].update_by_tradefeed(direction, rate_after_fee, amount_after_fee) #Add each of those trades to PnL
                 pnl_dict[row['model']].m_latest_trade_id = row_trade['globalTradeID'] #Update last trade id
-                print row['model']+" PnL updated with "+row_trade['type']+" "+format(amount_after_fee, '.20f')+" @ "+ str(rate_after_fee)
-                print row['model']+" net position = " + format(pnl_dict[row['model']].m_net_position, '.20f')+"\n"
+                logger.info(row['model']+" PnL updated with "+row_trade['type']+" "+format(amount_after_fee, '.20f')+" @ "+ str(rate_after_fee))
+                logger.info(row['model']+" net position = " + format(pnl_dict[row['model']].m_net_position, '.20f')+"\n")
 
 def update_live_pnl():
     update_trades()
@@ -267,14 +267,14 @@ def update_live_pnl():
     for key in pnl_dict:  
         pnl_dataframes.append(pnl_dict[key].to_data_frame())
         actual_pnl = round(pnl_dict[key].m_total_pnl / (base_multiplier * base_multiplier), 8) 
-        print "PnL "+key+": "+ str(actual_pnl)+" BTC"
-    print "\n"   
+        logger.info("Position "+key+": "+ str(pnl_dict[key].m_net_position)+"  PnL:"+ str(actual_pnl)+" BTC")
+    logger.info("\n")
     pnl = pd.concat(pnl_dataframes)
     pnl.to_csv(pnl_file_path, index = False)
     
     
 def add_to_order_file(model, order_number, currency_pair, rate, amount):
-    new_order = pd.DataFrame(np.array([[time.strftime("%Y-%m-%d %H:%M:%S"), model, str(order_number), currency_pair, format(rate, '.10f'), format(amount, '.10f')]]), columns=['time', 'model', 'order_number', 'instrument_id', 'price', 'amount'])
+    new_order = pd.DataFrame(np.array([[time.strftime("%Y-%m-%d %H:%M:%S"), model, str(order_number), currency_pair, format(rate, '.10f'), format(amount, '.10f'), 'ok']]), columns=['time', 'model', 'order_number', 'instrument_id', 'price', 'amount','status'])
     if(os.stat(order_file_path).st_size != 0):
         orders = pd.DataFrame.from_csv(order_file_path,index_col = None)
         orders = orders.append(new_order)
@@ -284,7 +284,7 @@ def add_to_order_file(model, order_number, currency_pair, rate, amount):
     
 def remove_from_order_file(order_number):
     orders = pd.DataFrame.from_csv(order_file_path,index_col = None)
-    orders = orders[orders.order_number != order_number]
+    orders.loc[orders.order_number == order_number, 'status'] = 'cancelled'
     orders.to_csv(order_file_path, index = False)
     
     

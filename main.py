@@ -18,6 +18,7 @@ update_live_pnl()
 
 def run_model():
     update_live_pnl()
+    withdraw_open_orders()
     btc_capital = get_capital(capital_path) 
     capital_allocated = btc_capital / len(models) #Capital equally allocated to each model
     for index, row in models.iterrows():
@@ -30,7 +31,7 @@ def run_model():
             
             
 schedule.every(10).minutes.do(update_live_pnl)
-schedule.every(1).hour.do(run_model)
+schedule.every(15).minutes.do(run_model)
 
 #Main Loop
 run_model()
